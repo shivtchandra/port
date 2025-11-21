@@ -1,0 +1,122 @@
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { ChevronDown, FileText } from "lucide-react";
+
+const experiences = [
+    {
+        id: "EXP-001",
+        role: "Intern",
+        company: "Callus",
+        period: "Current",
+        description: "Designed and handcrafted Figma UI for an AI application from scratch. Implemented the front-end in React matching the designs. Used Python and n8n for AI workflows and automation.",
+        tech: ["Figma", "React", "Python", "n8n"]
+    },
+    {
+        id: "EXP-002",
+        role: "Technical Intern",
+        company: "Getto",
+        period: "Previous",
+        description: "Improved vendor panel using React, Node.js, Express, PostgreSQL, and Docker. Enhanced system performance and user interface.",
+        tech: ["React", "Node.js", "PostgreSQL", "Docker"]
+    },
+    {
+        id: "EXP-003",
+        role: "Machine Learning Intern",
+        company: "Tuzen Tech Solutions",
+        period: "Previous",
+        description: "Developed ML-based counterfeit Indian currency detection with audio output using TensorFlow. Achieved accuracy of 95%+.",
+        tech: ["TensorFlow", "Python", "ML", "Computer Vision"]
+    },
+    {
+        id: "EXP-004",
+        role: "Volunteer Mentor",
+        company: "Make A Difference",
+        period: "Volunteering",
+        description: "Academic mentor for underprivileged students. Helping bridge the educational gap.",
+        tech: ["Mentorship", "Education", "Social Impact"]
+    }
+];
+
+export default function Experience() {
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+
+    return (
+        <section id="experience" className="min-h-screen flex items-center justify-center p-8 relative z-10">
+            <div className="max-w-4xl w-full">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    className="text-center mb-16"
+                >
+                    <h2 className="text-4xl md:text-6xl font-black uppercase text-off-white tracking-tighter mb-4 glitch" data-text="LAB EXPERIMENT FILES">
+                        LAB <span className="text-neon-red">EXPERIMENT FILES</span>
+                    </h2>
+                    <p className="font-mono text-off-white/60 tracking-widest text-sm">
+                        // CLASSIFIED RECORDS // AUTHORIZED PERSONNEL ONLY
+                    </p>
+                </motion.div>
+
+                <div className="space-y-4">
+                    {experiences.map((exp) => (
+                        <motion.div
+                            key={exp.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className={`border ${expandedId === exp.id ? 'border-neon-red bg-neon-red/5' : 'border-off-white/20 bg-black/60'} backdrop-blur-sm overflow-hidden transition-colors duration-300`}
+                        >
+                            <button
+                                onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
+                                className="w-full flex items-center justify-between p-6 text-left group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-2 rounded border ${expandedId === exp.id ? 'border-neon-red text-neon-red' : 'border-off-white/20 text-off-white/50'} group-hover:border-neon-red group-hover:text-neon-red transition-colors`}>
+                                        <FileText className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="font-mono text-xs text-off-white/50 mb-1 flex gap-2">
+                                            <span>{exp.id}</span>
+                                            <span className="text-neon-red">// {exp.period}</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-off-white group-hover:text-neon-red transition-colors">
+                                            {exp.role} <span className="text-off-white/60">@ {exp.company}</span>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <ChevronDown
+                                    className={`w-5 h-5 text-off-white/50 transition-transform duration-300 ${expandedId === exp.id ? 'rotate-180 text-neon-red' : ''}`}
+                                />
+                            </button>
+
+                            <AnimatePresence>
+                                {expandedId === exp.id && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <div className="px-6 pb-6 pt-0 border-t border-neon-red/20 mt-2">
+                                            <div className="pt-4 font-mono text-off-white/80 leading-relaxed text-sm">
+                                                {exp.description}
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 mt-4">
+                                                {exp.tech.map((t) => (
+                                                    <span key={t} className="text-xs font-mono px-2 py-1 bg-neon-red/10 text-neon-red border border-neon-red/20">
+                                                        {t}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
