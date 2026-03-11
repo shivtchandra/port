@@ -136,29 +136,29 @@ export default function AudioPlayer() {
                 onEnded={handleEnded}
             />
 
-            <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start gap-2">
+            <div className="fixed bottom-3 left-3 sm:bottom-6 sm:left-6 z-50 flex flex-col items-start gap-1 sm:gap-2 transition-all duration-500">
                 {/* Label / Error Message */}
                 {error ? (
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-neon-red tracking-widest uppercase bg-black/90 px-2 py-1 rounded border border-neon-red mb-1 animate-pulse">
-                        <AlertCircle size={12} />
-                        AUDIO FILE MISSING
+                    <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-[10px] font-mono text-neon-red tracking-widest uppercase bg-black/90 px-2 py-0.5 sm:py-1 rounded border border-neon-red mb-0.5 sm:mb-1 animate-pulse">
+                        <AlertCircle size={10} className="sm:w-[12px] sm:h-[12px]" />
+                        AUDIO MISSING
                     </div>
                 ) : (
-                    <div className="text-[10px] font-mono text-neon-red tracking-widest uppercase bg-black/80 px-2 py-1 rounded border border-neon-red/30 mb-1 max-w-[200px] truncate">
-                        {isPlaying ? "NOW PLAYING:" : "PAUSED:"} {currentTrack.title}
+                    <div className="text-[8px] sm:text-[10px] font-mono text-neon-red tracking-widest uppercase bg-black/80 px-2 py-0.5 sm:py-1 rounded border border-neon-red/30 mb-0.5 sm:mb-1 max-w-[150px] sm:max-w-[200px] truncate">
+                        {isPlaying ? "NOW_PLAYING:" : "PAUSED:"} {currentTrack.title}
                     </div>
                 )}
 
-                <div className="flex items-center gap-3 bg-black/90 border-2 border-neon-red/50 p-3 rounded-lg backdrop-blur-md shadow-[0_0_20px_rgba(229,9,20,0.3)] hover:shadow-[0_0_30px_rgba(229,9,20,0.5)] transition-all group">
+                <div className="flex items-center gap-2 sm:gap-3 bg-black/90 border-2 border-neon-red/50 p-2 sm:p-3 rounded-lg backdrop-blur-md shadow-[0_0_20px_rgba(229,9,20,0.3)] group scale-90 sm:scale-100 origin-left">
 
                     {/* Play/Pause Button */}
                     <button
                         onClick={togglePlay}
-                        className={`w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300 ${error ? 'border-gray-500 text-gray-500 cursor-not-allowed' : 'bg-neon-red/10 border-neon-red/50 text-neon-red hover:bg-neon-red hover:text-black'}`}
+                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border transition-all duration-300 ${error ? 'border-gray-500 text-gray-500 cursor-not-allowed' : 'bg-neon-red/10 border-neon-red/50 text-neon-red hover:bg-neon-red hover:text-black'}`}
                         aria-label={isPlaying ? "Pause" : "Play"}
                         disabled={error}
                     >
-                        {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-1" />}
+                        {isPlaying ? <Pause size={14} className="sm:w-[18px] sm:h-[18px]" fill="currentColor" /> : <Play size={14} className="sm:w-[18px] sm:h-[18px] ml-1" fill="currentColor" />}
                     </button>
 
                     {/* Volume Controls */}

@@ -16,8 +16,10 @@ import Projects from "./Projects";
 import Blogs from "./Blogs";
 import Leadership from "./Leadership";
 import Certifications from "./Certifications";
+import Freelance from "./Freelance";
 import Contact from "./Contact";
 import TeleportEffect from "./TeleportEffect";
+import Navbar from "./Navbar";
 
 export default function Scene3D() {
     const [showTeleport, setShowTeleport] = useState(false);
@@ -33,7 +35,7 @@ export default function Scene3D() {
                         <pointLight position={[0, 10, -100]} intensity={10} color="#E50914" distance={200} decay={2} />
 
                         <Suspense fallback={null}>
-                            <ScrollControls pages={12} damping={0.2}>
+                            <ScrollControls pages={14} damping={0.2}>
                                 <CameraController onTeleport={setShowTeleport} />
                                 <Sky />
                                 <Road />
@@ -43,17 +45,7 @@ export default function Scene3D() {
 
                                 {/* Content Sections in 3D Space */}
                                 <Scroll html style={{ width: '100%' }}>
-                                    <div className="w-full">
-                                        {/* Spacer for hero and road journey */}
-                                        <div className="h-[200vh]" />
-
-                                        {/* Teleport transition point */}
-                                        <div className="h-[100vh] flex items-center justify-center">
-                                            <div className="text-6xl font-black text-neon-red text-glow glitch" data-text="ENTERING THE UPSIDE DOWN">
-                                                ENTERING THE UPSIDE DOWN
-                                            </div>
-                                        </div>
-
+                                    <main className="w-full">
                                         {/* Content sections */}
                                         <About />
                                         <Skills />
@@ -61,9 +53,10 @@ export default function Scene3D() {
                                         <Projects />
                                         <Blogs />
                                         <Leadership />
+                                        <Freelance />
                                         <Certifications />
                                         <Contact />
-                                    </div>
+                                    </main>
                                 </Scroll>
                             </ScrollControls>
                             <Environment preset="night" />
@@ -73,6 +66,7 @@ export default function Scene3D() {
             </div>
 
             <TeleportEffect trigger={showTeleport} />
+            <Navbar />
         </div>
     );
 }

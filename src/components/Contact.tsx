@@ -2,11 +2,14 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Mail, Linkedin, Github, Twitter, ExternalLink } from "lucide-react";
+import { Mail, Linkedin, Github, Twitter, ExternalLink, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function Contact() {
     const [input, setInput] = useState("");
     const [glitch, setGlitch] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -21,12 +24,49 @@ export default function Contact() {
         }
     };
 
+    const handleTransmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setStatus('idle');
+
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get('name') as string;
+        const email = formData.get('email') as string;
+        const message = formData.get('message') as string;
+
+        try {
+            if (!supabase) {
+                console.error("Supabase client not initialized.");
+                setStatus('error');
+                return;
+            }
+            const { error } = await supabase
+                .from('transmissions')
+                .insert([{ name, email, message }]);
+
+            if (error) throw error;
+
+            setStatus('success');
+            (e.target as HTMLFormElement).reset();
+
+            // Still provide the mailto link option as a fallback or secondary action
+            const mailtoUrl = `mailto:shivachandra9490@gmail.com?subject=Transmission from ${name}&body=${message} (Contact: ${email})`;
+            console.log("Transmission saved to portal. Link ready:", mailtoUrl);
+
+        } catch (err) {
+            console.error("Transmission failed:", err);
+            setStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
-        <section id="contact" className={`min-h-screen flex flex-col items-center justify-center p-8 relative z-10 vhs-scanlines ${glitch ? 'invert' : ''}`}>
+        <section id="contact" className={`min-h-screen flex flex-col items-center justify-center p-3 sm:p-4 md:p-8 pt-20 sm:pt-10 relative z-10 vhs-scanlines transition-all duration-300 ${glitch ? 'invert' : ''}`}>
             <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="text-4xl md:text-6xl font-black uppercase mb-12 text-off-white tracking-tighter text-glow flicker glitch"
+                className="text-3xl sm:text-4xl md:text-6xl font-black uppercase mb-6 md:mb-12 text-off-white tracking-tighter text-glow flicker glitch leading-tight text-center"
                 data-text="PORTAL TERMINAL"
             >
                 PORTAL <span className="text-neon-red">TERMINAL</span>
@@ -36,42 +76,37 @@ export default function Contact() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-2xl bg-black border-2 border-neon-red/50 p-6 rounded-lg shadow-[0_0_20px_rgba(229,9,20,0.2)] font-mono red-glow-border glitch-in"
+                className="w-full max-w-2xl bg-black border-2 border-neon-red/50 p-4 sm:p-6 rounded-lg shadow-[0_0_20px_rgba(229,9,20,0.2)] font-mono red-glow-border glitch-in overflow-hidden"
             >
-                <div className="flex items-center gap-2 mb-6 border-b border-neon-red/20 pb-4">
-                    <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span className="ml-auto text-neon-red text-xs tracking-widest">COMM_UPLINK_V4.0</span>
+                <div className="flex items-center gap-2 mb-4 md:mb-6 border-b border-neon-red/20 pb-4">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 animate-pulse"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
+                    <span className="ml-auto text-neon-red text-[8px] sm:text-xs tracking-[0.2em] sm:tracking-widest">COMM_UPLINK_V4.0</span>
                 </div>
 
-                <div className="space-y-2 text-green-500 text-sm mb-8 font-mono">
+                <div className="space-y-1 sm:space-y-2 text-green-500 text-[10px] sm:text-sm mb-6 sm:mb-8 font-mono">
                     <p className="typing-effect">{">"} establishing_connection...</p>
-                    <p className="typing-effect delay-1000">{">"} channel_open</p>
-                    <p className="typing-effect delay-2000">{">"} awaiting_input...</p>
+                    <p className="typing-effect delay-1000 hidden sm:block">{">"} channel_open</p>
+                    <p className="typing-effect delay-2000">{status === 'success' ? "> transmission_received" : "> awaiting_input..."}</p>
+                    {status === 'error' && <p className="text-neon-red">{">"} signal_interference_detected. retry_transmission.</p>}
                 </div>
 
                 <form
                     className="space-y-6"
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        const name = (document.getElementById('name') as HTMLInputElement).value;
-                        const email = (document.getElementById('email') as HTMLInputElement).value;
-                        const message = (document.getElementById('message') as HTMLTextAreaElement).value;
-                        window.location.href = `mailto:shivachandra9490@gmail.com?subject=Transmission from ${name}&body=${message} (Contact: ${email})`;
-                    }}
+                    onSubmit={handleTransmit}
                 >
                     <div>
                         <label className="block text-neon-red text-xs uppercase tracking-widest mb-2">Identity</label>
-                        <input id="name" type="text" required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER NAME" />
+                        <input name="name" id="name" type="text" required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER NAME" />
                     </div>
                     <div>
                         <label className="block text-neon-red text-xs uppercase tracking-widest mb-2">Frequency</label>
-                        <input id="email" type="email" required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER EMAIL" />
+                        <input name="email" id="email" type="email" required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER EMAIL" />
                     </div>
                     <div>
                         <label className="block text-neon-red text-xs uppercase tracking-widest mb-2">Transmission</label>
-                        <textarea id="message" rows={4} required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER MESSAGE"></textarea>
+                        <textarea name="message" id="message" rows={4} required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER MESSAGE"></textarea>
                     </div>
 
                     {/* Easter Egg Input */}
@@ -85,8 +120,20 @@ export default function Contact() {
                         />
                     </div>
 
-                    <button type="submit" className="w-full bg-neon-red text-black font-bold uppercase py-4 tracking-widest hover:bg-red-600 transition-colors relative overflow-hidden group">
-                        <span className="relative z-10">Transmit Signal</span>
+                    <button
+                        disabled={isSubmitting}
+                        type="submit"
+                        className="w-full bg-neon-red text-black font-bold uppercase py-4 tracking-widest hover:bg-red-600 transition-colors relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                            {isSubmitting ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : status === 'success' ? (
+                                <CheckCircle2 className="w-5 h-5" />
+                            ) : (
+                                "Transmit Signal"
+                            )}
+                        </span>
                         <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                     </button>
                 </form>
