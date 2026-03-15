@@ -35,7 +35,7 @@ export default function Scene3D() {
                         <pointLight position={[0, 10, -100]} intensity={10} color="#E50914" distance={200} decay={2} />
 
                         <Suspense fallback={null}>
-                            <ScrollControls pages={14} damping={0.2}>
+                            <ScrollControls pages={9} damping={0.2}>
                                 <CameraController onTeleport={setShowTeleport} />
                                 <Sky />
                                 <Road />
@@ -51,10 +51,10 @@ export default function Scene3D() {
                                         <Skills />
                                         <Experience />
                                         <Projects />
+                                        <Freelance />
                                         <Blogs />
                                         <Leadership />
-                                        <Freelance />
-                                        <Certifications />
+                                         {/* <Certifications /> */}
                                         <Contact />
                                     </main>
                                 </Scroll>

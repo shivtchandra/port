@@ -3,24 +3,25 @@
 import { motion } from "framer-motion";
 import { Briefcase, ExternalLink, Target, Shield, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 const STATIC_MISSIONS = [
     {
-        client_name: "Private Client",
-        mission_title: "Corporate Portal Alpha",
-        description: "Developed a full-stack corporate portal with real-time analytics and encrypted communication channels.",
-        services: ["Next.js", "Supabase", "Framer Motion"],
-        result_metric: "Reduced latency by 45%",
-        link: "#"
+        client_name: "CyberSecurityTrain",
+        mission_title: "EdTech LMS Platform",
+        description: "Built a production-grade cybersecurity LMS with content delivery, Razorpay, custom exams, and public certificate verification with serial numbers.",
+        services: ["React 18", "Next.js 15", "Firebase", "Razorpay", "jsPDF"],
+        result_metric: "End-to-end production deployment",
+        link: "https://cybersecuritytrain.com"
     },
     {
-        client_name: "Tech Startup",
-        mission_title: "AI Asset Manager",
-        description: "Built an automated asset management system using GPT-4 for content categorization and tagging.",
-        services: ["Python", "React", "OpenAI API"],
-        result_metric: "Automated 90% of manual tasks",
-        link: "#"
+        client_name: "TheCyberSeal",
+        mission_title: "B2B Services Portal",
+        description: "Developed a cybersecurity portal with a gated resource center, lead capture pipeline, and real-time threat alerts dashboard.",
+        services: ["Vite", "Supabase", "Tailwind CSS", "Framer Motion"],
+        result_metric: "Integrated real-time threat detection UI",
+        link: "https://thecyberseal.com"
     }
 ];
 
@@ -30,22 +31,14 @@ export default function Freelance() {
 
     useEffect(() => {
         async function fetchMissions() {
-            if (!supabase) {
-                setMissions(STATIC_MISSIONS);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('freelance_missions')
-                    .select('*')
-                    .order('display_order', { ascending: true });
+                const q = query(collection(db, "freelance_missions"), orderBy("display_order", "asc"));
+                const querySnapshot = await getDocs(q);
 
-                if (error || !data || data.length === 0) {
+                if (querySnapshot.empty) {
                     setMissions(STATIC_MISSIONS);
                 } else {
-                    setMissions(data);
+                    setMissions(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 }
             } catch (e) {
                 console.error("Failed to load missions:", e);

@@ -3,29 +3,47 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Github, Pin, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 const STATIC_PROJECTS = [
     {
-        title: "CivicWatch",
-        category: "Community Safety",
-        description: "A community crime and civic reporting platform enabling real-time incident tracking and neighborhood safety alerts.",
-        stack: ["React", "TypeScript", "Node", "PostgreSQL", "Docker"],
+        title: "Resumit",
+        category: "Full Stack",
+        image: "/projects/resumit.png",
+        description: "AI-powered resume platform featuring feedback, scoring, improvement suggestions using LLMs, and a smart template recommendation engine. 200+ resumes analyzed since launch.",
+        stack: ["React.js", "Python", "OpenAI API", "Vercel"],
+        links: { github: "#", demo: "https://resumit-kappa.vercel.app" }
+    },
+    {
+        title: "Trippy",
+        category: "Full Stack",
+        image: "/projects/trippy.png",
+        description: "A full-stack travel itinerary builder with real-time collaboration, drag-and-drop activity planning, and group trip management features.",
+        stack: ["React", "TypeScript", "Tailwind CSS", "Firebase"],
+        links: { github: "#", demo: "https://trippy-blond.vercel.app/" }
+    },
+    {
+        title: "Digital Invitation",
+        category: "Full Stack",
+        image: "/projects/invite.png",
+        description: "A digital invitation and event management platform with real-time RSVP tracking and personalized guest experiences.",
+        stack: ["React", "TypeScript", "Tailwind CSS", "Firebase"],
+        links: { github: "#", demo: "https://invite-client-tan.vercel.app/" }
+    },
+    {
+        title: "Medical Impact Predictor",
+        category: "Full Stack",
+        description: "ML system predicting hospital stays/costs using 430K+ MIMIC-IV patient records with XGBoost quantile regression.",
+        stack: ["Python", "XGBoost", "Flask", "React"],
         links: { github: "#", demo: "#" }
     },
     {
-        title: "Quizx-Study",
-        category: "AI Education",
-        description: "Adaptive learning agent using RAG and BKT to generate personalized quizzes and study materials based on user performance.",
-        stack: ["Python", "Streamlit", "LangChain", "RAG", "BKT"],
-        links: { github: "#", demo: "#" }
-    },
-    {
-        title: "Stock Trend Prediction",
-        category: "Financial AI",
-        description: "Machine learning model analyzing ESG scores and financial data to predict stock market trends with high accuracy.",
-        stack: ["Python", "LSTM", "ML", "Data Analysis"],
-        links: { github: "#", demo: "#" }
+        title: "Instant Tab Screenshot",
+        category: "Web Extension",
+        description: "Published Chrome extension with 5.0 rating. Multi-mode capture (visible, selection, full-page) with zero-data collection policy.",
+        stack: ["JavaScript", "Chrome API", "Manifest V3"],
+        links: { github: "#", demo: "https://chromewebstore.google.com/detail/nfjacblekofgmkigcfonfdgabjedkdao" }
     }
 ];
 
@@ -35,25 +53,20 @@ export default function Projects() {
 
     useEffect(() => {
         async function fetchProjects() {
-            if (!supabase) {
-                setProjects(STATIC_PROJECTS);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('projects')
-                    .select('*')
-                    .order('display_order', { ascending: true });
+                const q = query(collection(db, "projects"), orderBy("display_order", "asc"));
+                const querySnapshot = await getDocs(q);
 
-                if (error || !data || data.length === 0) {
+                if (querySnapshot.empty) {
                     setProjects(STATIC_PROJECTS);
                 } else {
-                    setProjects(data.map(p => ({
-                        ...p,
-                        links: { github: p.github_link, demo: p.demo_link }
-                    })));
+                    setProjects(querySnapshot.docs.map(doc => {
+                        const p = doc.data();
+                        return {
+                            ...p,
+                            links: { github: p.github_link, demo: p.demo_link }
+                        };
+                    }));
                 }
             } catch (e) {
                 console.error("Failed to load projects:", e);
@@ -99,17 +112,26 @@ export default function Projects() {
                                 whileInView={{ opacity: 1, y: 0, rotate: 0 }}
                                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                                 whileHover={{ scale: 1.02, zIndex: 10 }}
-                                className="bg-[#1a1a1a] p-4 sm:p-6 relative shadow-xl border border-off-white/5 group"
+                                className="bg-[#1a1a1a] relative shadow-xl border border-off-white/5 group overflow-hidden"
                             >
                                 {/* Pin Effect */}
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-neon-red drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-neon-red drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)] z-20">
                                     <Pin className="w-6 h-6 md:w-8 md:h-8 fill-neon-red" />
                                 </div>
 
-                                {/* Tape Effect */}
-                                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 md:w-16 h-6 md:h-8 bg-white/10 rotate-2 backdrop-blur-sm"></div>
+                                {/* Project Image Header */}
+                                {project.image && (
+                                    <div className="relative w-full h-40 md:h-48 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
+                                        <img 
+                                            src={project.image} 
+                                            alt={project.title} 
+                                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] to-transparent opacity-60"></div>
+                                    </div>
+                                )}
 
-                                <div className="mt-4">
+                                <div className="p-4 sm:p-6">
                                     <div className="flex justify-between items-start mb-4">
                                         <span className="font-mono text-[10px] text-neon-red tracking-widest border border-neon-red/30 px-2 py-1">
                                             {project.category}

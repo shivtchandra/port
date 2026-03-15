@@ -60,12 +60,12 @@ export default function Navbar() {
                     className="flex items-center gap-2 cursor-pointer group"
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 >
-                    <div className="relative">
-                        <Terminal className="w-5 h-5 md:w-6 md:h-6 text-neon-red group-hover:scale-110 transition-transform" />
+                    <div className="relative flex items-center justify-center w-8 h-8 md:w-10 md:h-10 border-2 border-neon-red/80 rounded-sm group-hover:bg-neon-red transition-all duration-300">
+                        <span className="font-black text-neon-red group-hover:text-black transition-colors text-sm md:text-base">ST</span>
                         <div className="absolute inset-0 bg-neon-red/20 blur-md rounded-full group-hover:bg-neon-red/40 transition-colors"></div>
                     </div>
-                    <span className="font-black text-xs md:text-sm uppercase tracking-[0.2em] text-off-white group-hover:text-neon-red transition-colors">
-                        SC_PORTAL_<span className="text-neon-red">v2.5</span>
+                    <span className="font-black text-[10px] md:text-sm uppercase tracking-[0.3em] text-off-white group-hover:text-neon-red transition-colors">
+                        TACTICAL_<span className="text-neon-red">REPORT</span>
                     </span>
                 </div>
 

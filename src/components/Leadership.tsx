@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
 
 const STATIC_ROLES = [
@@ -24,22 +25,14 @@ export default function Leadership() {
 
     useEffect(() => {
         async function fetchLeadership() {
-            if (!supabase) {
-                setRoles(STATIC_ROLES);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('leadership')
-                    .select('*')
-                    .order('display_order', { ascending: true });
+                const q = query(collection(db, "leadership"), orderBy("display_order", "asc"));
+                const querySnapshot = await getDocs(q);
 
-                if (error || !data || data.length === 0) {
+                if (querySnapshot.empty) {
                     setRoles(STATIC_ROLES);
                 } else {
-                    setRoles(data);
+                    setRoles(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 }
             } catch (e) {
                 console.error("Failed to load leadership:", e);

@@ -1,7 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import {
+    collection,
+    query,
+    orderBy,
+    getDocs,
+    getDoc,
+    setDoc,
+    doc,
+    deleteDoc,
+    addDoc,
+    serverTimestamp,
+    updateDoc
+} from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Mail, Clock, Trash2, Loader2, RefreshCw, AlertCircle,
@@ -24,35 +37,30 @@ export default function AdminPage() {
     const [authError, setAuthError] = useState(false);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-    const isConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const isConfigured = true; // Firebase is initialized in lib/firebase
 
     const fetchData = async (tab: Tab) => {
-        if (!supabase) return;
         setRefreshing(true);
         try {
             if (tab === 'settings') {
-                const { data: result, error } = await supabase
-                    .from('site_settings')
-                    .select('*')
-                    .eq('id', 'about')
-                    .single();
-
-                if (error && error.code !== 'PGRST116') throw error;
-                setData(result ? [result] : []);
+                const docRef = doc(db, 'site_settings', 'about');
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    setData([{ id: docSnap.id, ...docSnap.data() }]);
+                } else {
+                    setData([]);
+                }
             } else {
-                let query = supabase.from(tab === 'messages' ? 'transmissions' : tab);
-
-                const { data: result, error } = await query
-                    .select('*')
-                    .order(tab === 'messages' ? 'created_at' : 'display_order', { ascending: false });
-
-                if (error) throw error;
-                setData(result || []);
+                const table = tab === 'messages' ? 'transmissions' : tab;
+                const orderField = tab === 'messages' ? 'timestamp' : 'display_order';
+                const q = query(collection(db, table), orderBy(orderField, 'desc'));
+                const querySnapshot = await getDocs(q);
+                
+                setData(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
             }
         } catch (e: any) {
             console.error(`Fetch failed for ${tab}:`, e.message || e);
-            if (e.details) console.error("Error details:", e.details);
-            if (e.hint) console.error("Error hint:", e.hint);
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -93,45 +101,40 @@ export default function AdminPage() {
     };
 
     const handleDelete = async (id: any) => {
-        if (activeTab === 'settings') return; // Cannot delete core settings
+        if (activeTab === 'settings') return;
         if (!confirm("Are you sure? This cannot be undone.")) return;
-        if (!supabase) return;
 
         const table = activeTab === 'messages' ? 'transmissions' : activeTab;
-        const { error } = await supabase.from(table).delete().eq('id', id);
-
-        if (error) {
-            alert("Error deleting item");
-        } else {
+        try {
+            await deleteDoc(doc(db, table, id));
             setData(data.filter(item => item.id !== id));
+        } catch (e: any) {
+            alert("Error deleting item: " + e.message);
         }
     };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!supabase) return;
 
-        if (activeTab === 'settings') {
-            const { error } = await supabase
-                .from('site_settings')
-                .upsert({ id: 'about', content: editingItem });
-
-            if (error) {
-                alert("Error saving settings: " + error.message);
+        try {
+            if (activeTab === 'settings') {
+                await setDoc(doc(db, 'site_settings', 'about'), editingItem);
             } else {
-                setEditingItem(null);
-                fetchData(activeTab);
+                const table = activeTab === 'messages' ? 'transmissions' : activeTab;
+                if (editingItem.id) {
+                    const { id, ...saveData } = editingItem;
+                    await setDoc(doc(db, table, id), saveData);
+                } else {
+                    await addDoc(collection(db, table), {
+                        ...editingItem,
+                        created_at: serverTimestamp()
+                    });
+                }
             }
-        } else {
-            const table = activeTab === 'messages' ? 'transmissions' : activeTab;
-            const { error } = await supabase.from(table).upsert([editingItem]);
-
-            if (error) {
-                alert("Error saving: " + error.message);
-            } else {
-                setEditingItem(null);
-                fetchData(activeTab);
-            }
+            setEditingItem(null);
+            fetchData(activeTab);
+        } catch (e: any) {
+            alert("Error saving: " + e.message);
         }
     };
 

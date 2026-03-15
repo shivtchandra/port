@@ -2,13 +2,14 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
 
 const STATIC_SKILLS = [
     {
         title: "PROGRAMMING",
-        skills: ["Java", "Python", "JavaScript", "TypeScript"]
+        skills: ["Core Java", "Python", "JavaScript", "TypeScript"]
     },
     {
         title: "AI / ML CORE",
@@ -16,19 +17,23 @@ const STATIC_SKILLS = [
     },
     {
         title: "DATA SCIENCE",
-        skills: ["Scikit-learn", "NumPy", "Pandas"]
+        skills: ["Scikit-learn", "NumPy", "Pandas", "Matplotlib"]
     },
     {
         title: "FRONTEND",
-        skills: ["React.js", "HTML5", "CSS3", "Tailwind"]
+        skills: ["React.js", "Next.js", "HTML5", "CSS3", "Tailwind", "Framer Motion", "Vite"]
     },
     {
         title: "BACKEND",
-        skills: ["Node.js", "Express.js", "Prisma ORM"]
+        skills: ["Node.js", "Express.js", "Prisma ORM", "FastAPI"]
     },
     {
-        title: "INFRASTRUCTURE",
-        skills: ["PostgreSQL", "MySQL", "Docker", "Git", "Vercel", "Hugging Face"]
+        title: "CLOUD & DEVOPS",
+        skills: ["AWS", "Azure", "GCP", "Docker", "Git", "Firebase", "Supabase", "Vercel"]
+    },
+    {
+        title: "TOOLS & ANALYTICS",
+        skills: ["Tableau", "Power BI", "n8n", "Chrome Extension API", "PostgreSQL", "SQL"]
     }
 ];
 
@@ -38,25 +43,20 @@ export default function Skills() {
 
     useEffect(() => {
         async function fetchSkills() {
-            if (!supabase) {
-                setSkillCategories(STATIC_SKILLS);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('skills')
-                    .select('*')
-                    .order('display_order', { ascending: true });
+                const q = query(collection(db, "skills"), orderBy("display_order", "asc"));
+                const querySnapshot = await getDocs(q);
 
-                if (error || !data || data.length === 0) {
+                if (querySnapshot.empty) {
                     setSkillCategories(STATIC_SKILLS);
                 } else {
-                    setSkillCategories(data.map(d => ({
-                        title: d.category_title,
-                        skills: d.skills_list
-                    })));
+                    setSkillCategories(querySnapshot.docs.map(doc => {
+                        const d = doc.data();
+                        return {
+                            title: d.category_title,
+                            skills: d.skills_list
+                        };
+                    }));
                 }
             } catch (e) {
                 console.error("Failed to load skills:", e);

@@ -3,28 +3,24 @@
 import { motion } from "framer-motion";
 import { BadgeCheck, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 const STATIC_CERTS = [
     {
         title: "Core Java",
         issuer: "Coursera",
-        cert_id: "CJ-2023-X"
+        cert_id: "CJ-CERT-2024"
     },
     {
         title: "Google Analytics",
         issuer: "Google",
-        cert_id: "GA-CERT-01"
+        cert_id: "GA-CERT-2024"
     },
     {
-        title: "Data Structures",
+        title: "Data Structures and Algorithms",
         issuer: "Coursera",
-        cert_id: "DSA-ADV-99"
-    },
-    {
-        title: "Digital Transformation",
-        issuer: "IIM Ahmedabad",
-        cert_id: "IIM-DT-2024"
+        cert_id: "DSA-ADV-2024"
     }
 ];
 
@@ -34,22 +30,14 @@ export default function Certifications() {
 
     useEffect(() => {
         async function fetchCerts() {
-            if (!supabase) {
-                setCerts(STATIC_CERTS);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('certifications')
-                    .select('*')
-                    .order('display_order', { ascending: true });
+                const q = query(collection(db, "certifications"), orderBy("display_order", "asc"));
+                const querySnapshot = await getDocs(q);
 
-                if (error || !data || data.length === 0) {
+                if (querySnapshot.empty) {
                     setCerts(STATIC_CERTS);
                 } else {
-                    setCerts(data);
+                    setCerts(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 }
             } catch (e) {
                 console.error("Failed to load certifications:", e);

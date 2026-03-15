@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Radio, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 const STATIC_BLOGS = [
     {
@@ -26,22 +27,14 @@ export default function Blogs() {
 
     useEffect(() => {
         async function fetchBlogs() {
-            if (!supabase) {
-                setBlogs(STATIC_BLOGS);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('blogs')
-                    .select('*')
-                    .order('display_order', { ascending: true });
+                const q = query(collection(db, "blogs"), orderBy("display_order", "asc"));
+                const querySnapshot = await getDocs(q);
 
-                if (error || !data || data.length === 0) {
+                if (querySnapshot.empty) {
                     setBlogs(STATIC_BLOGS);
                 } else {
-                    setBlogs(data);
+                    setBlogs(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 }
             } catch (e) {
                 console.error("Failed to load blogs:", e);

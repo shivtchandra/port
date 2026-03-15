@@ -9,7 +9,7 @@ const redHat = Red_Hat_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Shiva Chandra T | The Upside Down",
+  title: "ST | TACTICAL_REPORT",
   description: "Front-End Craft • AI Engineering • Creative Technologist",
 };
 

@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
+import GithubStats from "./GithubStats";
 
 export default function About() {
     const [settings, setSettings] = useState<Record<string, any>>({});
@@ -11,20 +13,12 @@ export default function About() {
 
     useEffect(() => {
         async function fetchSettings() {
-            if (!supabase) {
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('site_settings')
-                    .select('content')
-                    .eq('id', 'about')
-                    .single();
+                const docRef = doc(db, "site_settings", "about");
+                const docSnap = await getDoc(docRef);
 
-                if (!error && data) {
-                    setSettings(data.content);
+                if (docSnap.exists()) {
+                    setSettings(docSnap.data());
                 }
             } catch (e) {
                 console.error("Failed to load settings:", e);
@@ -43,12 +37,17 @@ export default function About() {
         );
     }
 
-    const bio = settings.bio || "Subject demonstrates exceptional capability in bridging the gap between creative design and technical implementation.";
+    const bio = settings.bio || "Full-Stack & AI Engineer with hands-on experience building production-grade systems including a full LMS/EdTech platform, cybersecurity services portal, AI-powered tools, and published Chrome extensions used by real users. Skilled in LLM integrations, RAG systems, React frontends, Firebase, and multi-role admin systems.";
     const location = settings.location || "Hyderabad, India";
-    const education_title = settings.education_title || "B.E. in CSE (2021–2025)";
-    const education_school = settings.education_school || "GITAM University";
-    const specializations = settings.specializations || ["Front-End Craft", "AI Applications", "Full-Stack Exp.", "Design-to-Code"];
-    const mission = settings.mission || "Actively seeking collaboration on high-impact projects. Ready for deployment in Front-End or Full-Stack roles.";
+    const phone = settings.phone || "+91 9959041832";
+    const email = settings.email || "shivachandra9490@gmail.com";
+    const education = settings.education || [
+        { title: "B.E. in CSE (2021–2025)", school: "GITAM University", detail: "CGPA: 7.64 / 10.0" },
+        { title: "Secondary Education (2019 - 2021)", school: "Narayana Junior College", detail: "Percentage: 92.4%" },
+        { title: "High School (2018 - 2019)", school: "FIITJEE", detail: "CGPA: 9.3 / 10.0" }
+    ];
+    const specializations = settings.specializations || ["Front-End Craft", "AI Applications", "Full-Stack Exp.", "Cloud Infrastructure"];
+    const mission = settings.mission || "Currently working as a Multicloud Engineer Associate at Cognizant. Ready for deployment in mission-critical AI and Full-Stack roles.";
 
     return (
         <section id="about" className="min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-8 pt-20 sm:pt-4 relative z-10 transition-all duration-300">
@@ -89,16 +88,28 @@ export default function About() {
                     {/* Personal Stats */}
                     <div className="md:col-span-1 space-y-6 font-mono text-sm order-2 md:order-1">
                         <div className="group">
+                            <p className="text-neon-red text-xs tracking-widest mb-1">CONTACT</p>
+                            <div className="text-off-white border-l-2 border-neon-red/50 pl-3 group-hover:bg-neon-red/5 transition-colors py-1">
+                                <p className="text-xs">{phone}</p>
+                                <p className="text-[10px] text-off-white/70">{email}</p>
+                            </div>
+                        </div>
+                        <div className="group">
                             <p className="text-neon-red text-xs tracking-widest mb-1">LOCATION</p>
                             <p className="text-off-white border-l-2 border-neon-red/50 pl-3 group-hover:bg-neon-red/5 transition-colors py-1">
                                 {location}
-                            </p>
+                             </p>
                         </div>
                         <div className="group">
                             <p className="text-neon-red text-xs tracking-widest mb-1">EDUCATION</p>
-                            <div className="text-off-white border-l-2 border-neon-red/50 pl-3 group-hover:bg-neon-red/5 transition-colors py-1">
-                                <p className="font-bold text-xs md:text-sm">{education_title}</p>
-                                <p className="text-off-white/70 text-xs">{education_school}</p>
+                            <div className="space-y-3 border-l-2 border-neon-red/50 pl-3 group-hover:bg-neon-red/5 transition-colors py-1">
+                                {education.map((edu: any, i: number) => (
+                                    <div key={i}>
+                                        <p className="font-bold text-xs md:text-sm">{edu.title}</p>
+                                        <p className="text-off-white/70 text-[10px] md:text-xs">{edu.school}</p>
+                                        <p className="text-neon-red/60 text-[8px] md:text-[10px] uppercase font-bold">{edu.detail}</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         <div className="group">
@@ -125,6 +136,8 @@ export default function About() {
                         </div>
                     </div>
                 </div>
+                
+                <GithubStats />
 
                 {/* Decorative Elements */}
                 <div className="absolute bottom-4 right-4 w-12 md:w-24 h-12 md:h-24 border-r-2 border-b-2 border-neon-red/20"></div>
@@ -133,4 +146,6 @@ export default function About() {
         </section>
     );
 }
+
+
 

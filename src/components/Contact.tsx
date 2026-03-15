@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Mail, Linkedin, Github, Twitter, ExternalLink, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 export default function Contact() {
     const [input, setInput] = useState("");
@@ -35,23 +36,18 @@ export default function Contact() {
         const message = formData.get('message') as string;
 
         try {
-            if (!supabase) {
-                console.error("Supabase client not initialized.");
-                setStatus('error');
-                return;
-            }
-            const { error } = await supabase
-                .from('transmissions')
-                .insert([{ name, email, message }]);
-
-            if (error) throw error;
+            await addDoc(collection(db, "transmissions"), {
+                name,
+                email,
+                message,
+                timestamp: serverTimestamp()
+            });
 
             setStatus('success');
             (e.target as HTMLFormElement).reset();
 
-            // Still provide the mailto link option as a fallback or secondary action
             const mailtoUrl = `mailto:shivachandra9490@gmail.com?subject=Transmission from ${name}&body=${message} (Contact: ${email})`;
-            console.log("Transmission saved to portal. Link ready:", mailtoUrl);
+            console.log("Transmission saved to Firebase. Link ready:", mailtoUrl);
 
         } catch (err) {
             console.error("Transmission failed:", err);

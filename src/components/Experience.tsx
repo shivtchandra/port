@@ -3,39 +3,56 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ChevronDown, FileText, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 const STATIC_EXPERIENCES = [
     {
         id: "EXP-001",
-        role: "Intern",
-        company: "Callus",
-        period: "Current",
-        description: "Designed and handcrafted Figma UI for an AI application from scratch. Implemented the front-end in React matching the designs. Used Python and n8n for AI workflows and automation.",
-        tech: ["Figma", "React", "Python", "n8n"]
+        role: "Multicloud Engineer Associate",
+        company: "Cognizant",
+        period: "Feb 2026 – Present",
+        description: "Undergoing structured multicloud training covering AWS, Azure, and GCP as part of the Multicloud Engineer track.",
+        tech: ["AWS", "Azure", "GCP", "Cloud Infrastructure"]
     },
     {
         id: "EXP-002",
-        role: "Technical Intern",
-        company: "Getto",
-        period: "Previous",
-        description: "Improved vendor panel using React, Node.js, Express, PostgreSQL, and Docker. Enhanced system performance and user interface.",
-        tech: ["React", "Node.js", "PostgreSQL", "Docker"]
+        role: "Freelance Full-Stack Developer",
+        company: "Self-Employed",
+        period: "Dec 2025 - Feb 2026",
+        description: "Designed and delivered two production-grade platforms: CyberSecurityTrain (LMS with Razorpay) and TheCyberSeal (B2B portal). Managed end-to-end development from requirements to live deployment.",
+        tech: ["React 18", "Next.js 15", "Firebase", "Supabase", "Razorpay", "jsPDF"]
     },
     {
         id: "EXP-003",
-        role: "Machine Learning Intern",
-        company: "Tuzen Tech Solutions",
-        period: "Previous",
-        description: "Developed ML-based counterfeit Indian currency detection with audio output using TensorFlow. Achieved accuracy of 95%+.",
-        tech: ["TensorFlow", "Python", "ML", "Computer Vision"]
+        role: "AI / Full-Stack Automation Intern",
+        company: "Callus",
+        period: "Oct 2025 - Dec 2025",
+        description: "Automated SEO research workflows. Built AI-driven keyword analysis, competitor scraping, and RAG-based document querying by converting n8n workflows into a FastAPI/React application.",
+        tech: ["FastAPI", "Python", "React", "OpenAI", "Pinecone", "n8n"]
     },
     {
         id: "EXP-004",
-        role: "Volunteer Mentor",
-        company: "Make A Difference",
-        period: "Volunteering",
-        description: "Academic mentor for underprivileged students. Helping bridge the educational gap.",
+        role: "Technical Intern",
+        company: "Getto",
+        period: "July 2025 - Oct 2025",
+        description: "Enhanced vendor panel UI/workflows. Specialized in product management streamlining and database interaction optimization in an Agile environment.",
+        tech: ["React.js", "Express.js", "Node.js", "PostgreSQL", "Docker"]
+    },
+    {
+        id: "EXP-005",
+        role: "Machine Learning Intern",
+        company: "Tuzen Tech Solutions",
+        period: "May 2024 - July 2024",
+        description: "Developed ML solution for counterfeit currency detection. Built preprocessing pipeline and trained models with TensorFlow, achieving 95%+ accuracy.",
+        tech: ["TensorFlow", "Python", "ML", "Computer Vision"]
+    },
+    {
+        id: "EXP-006",
+        role: "Academic Support Volunteer",
+        company: "Make A Difference (MAD)",
+        period: "March 2025 - Present",
+        description: "Providing academic mentoring and personalized support to underprivileged students to bridge foundational learning gaps.",
         tech: ["Mentorship", "Education", "Social Impact"]
     }
 ];
@@ -47,21 +64,14 @@ export default function Experience() {
 
     useEffect(() => {
         async function fetchExperience() {
-            if (!supabase) {
-                setExperiences(STATIC_EXPERIENCES);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase
-                    .from('experience')
-                    .select('*')
-                    .order('display_order', { ascending: true });
-
-                if (error || !data || data.length === 0) {
+                const q = query(collection(db, "experience"), orderBy("display_order", "asc"));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
                     setExperiences(STATIC_EXPERIENCES);
                 } else {
+                    const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     setExperiences(data);
                 }
             } catch (e) {
