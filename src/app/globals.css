@@ -1,285 +1,283 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #000000;
-  --color-foreground: #e3e3e3;
-  --color-off-white: #E3E3E3;
-  --color-neon-red: #E50914;
-  --color-glow-red: #E50A15;
-  --color-accent: #E50914;
+  /* Color Tokens — monochrome */
+  --color-bg: #0A0A0A;
+  --color-surface: #111111;
+  --color-surface-raised: #161616;
+  --color-border: rgba(255, 255, 255, 0.10);
+  --color-border-hover: rgba(255, 255, 255, 0.30);
+  --color-text: #FAFAFA;
+  --color-text-muted: #7A7A7A;
+  --color-accent: #FAFAFA;
+  --color-accent-glow: rgba(255, 255, 255, 0.08);
 
-  --font-sans: var(--font-red-hat-display), ui-sans-serif, system-ui, sans-serif;
+  /* Legacy aliases */
+  --color-background: #0A0A0A;
+  --color-foreground: #FAFAFA;
+
+  /* Typography */
+  --font-display: var(--font-unbounded), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    background-color: var(--color-background);
-    color: var(--color-off-white);
+    background-color: var(--color-bg);
+    color: var(--color-text);
     font-family: var(--font-sans);
     overflow-x: hidden;
   }
 
   ::selection {
-    background-color: var(--color-neon-red);
-    color: black;
+    background-color: var(--color-accent);
+    color: #0A0A0A;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  /* Custom cursor — hide native on pointer devices */
+  @media (pointer: fine) {
+    *, *::before, *::after {
+      cursor: none !important;
+    }
   }
 }
 
 @layer utilities {
-  .text-glow {
-    text-shadow: 0 0 10px rgba(229, 9, 20, 0.7), 0 0 20px rgba(229, 9, 20, 0.5);
+  .font-display {
+    font-family: var(--font-display);
   }
 
-  .box-glow {
-    box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
-  }
-
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-
-  /* VHS Scan Lines */
-  .vhs-scanlines {
+  .heading-line {
     position: relative;
+    display: inline-block;
   }
 
-  .vhs-scanlines::before {
-    content: "";
+  .heading-line::after {
+    content: '';
     position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
-        transparent 1px,
-        transparent 2px);
-    pointer-events: none;
-    z-index: 1;
-    animation: scanline 8s linear infinite;
-  }
-
-  @keyframes scanline {
-    0% {
-      transform: translateY(0);
-    }
-
-    100% {
-      transform: translateY(10px);
-    }
-  }
-
-  /* Glitch Effect */
-  .glitch {
-    position: relative;
-    animation: glitch-anim 3s infinite;
-  }
-
-  @keyframes glitch-anim {
-
-    0%,
-    90%,
-    100% {
-      transform: translate(0);
-    }
-
-    92% {
-      transform: translate(-2px, 2px);
-    }
-
-    94% {
-      transform: translate(2px, -2px);
-    }
-
-    96% {
-      transform: translate(-2px, -2px);
-    }
-
-    98% {
-      transform: translate(2px, 2px);
-    }
-  }
-
-  .glitch::before,
-  .glitch::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
+    bottom: -4px;
     left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-accent);
+    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .heading-line.in-view::after {
     width: 100%;
-    height: 100%;
   }
 
-  .glitch::before {
-    animation: glitch-anim-2 2.5s infinite;
-    color: #E50914;
-    z-index: -1;
+  .index-num,
+  .track-num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-text-muted);
+    opacity: 0.4;
+    font-variant-numeric: tabular-nums;
   }
+}
 
-  .glitch::after {
-    animation: glitch-anim-3 2s infinite;
-    color: #00ffff;
-    z-index: -2;
+/* ── Ambient background — mono "stage glow" + vinyl + EQ spectrum (musical, not flat black) ── */
+.ambient-bg {
+  position: relative;
+  background-color: #0A0A0A;
+  background-image:
+    radial-gradient(65% 55% at 50% -8%, rgba(255, 255, 255, 0.14), transparent 72%),
+    radial-gradient(55% 55% at 12% 92%, rgba(255, 255, 255, 0.06), transparent 70%),
+    radial-gradient(140% 130% at 50% 45%, transparent 48%, rgba(0, 0, 0, 0.55));
+  animation: ambient-drift 24s ease-in-out infinite alternate;
+}
+
+/* ── Spinning vinyl record (site-wide, fixed layer) ── */
+.vinyl-layer {
+  will-change: opacity, transform;
+}
+
+.vinyl-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.vinyl-disc {
+  position: absolute;
+  /* A clear, complete record — centerpiece in the empty right of the hero */
+  width: min(78vmin, 620px);
+  height: min(78vmin, 620px);
+  top: 50%;
+  right: clamp(-14vmin, 2vw, 4vmin);
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background:
+    /* crisp outer rim of the record */
+    radial-gradient(circle at center,
+      transparent 78.5%,
+      rgba(255, 255, 255, 0.45) 79.5%,
+      rgba(255, 255, 255, 0.12) 81%,
+      transparent 84%),
+    /* grooves */
+    repeating-radial-gradient(circle at center,
+      rgba(255, 255, 255, 0.16) 0px,
+      rgba(255, 255, 255, 0.16) 1px,
+      transparent 1px,
+      transparent 5px),
+    /* disc body — a soft top-left sheen, clearly lighter than the page */
+    radial-gradient(circle at 40% 36%,
+      #4a4a4a 0%,
+      #333333 44%,
+      #242424 70%,
+      #181818 88%,
+      #101010 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 0 90px 16px rgba(0, 0, 0, 0.32),
+    0 0 130px 10px rgba(255, 255, 255, 0.12);
+  /* feather only the outermost edge so it sits cleanly on the black, no hard cut */
+  -webkit-mask-image: radial-gradient(circle at center, #000 0%, #000 87%, transparent 99%);
+  mask-image: radial-gradient(circle at center, #000 0%, #000 87%, transparent 99%);
+  animation: vinyl-spin 16s linear infinite;
+}
+
+/* Rotating light glints — reads as a record reflecting stage light */
+.vinyl-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.07) 22deg,
+    transparent 70deg,
+    transparent 170deg,
+    rgba(255, 255, 255, 0.055) 195deg,
+    transparent 250deg,
+    transparent 360deg
+  );
+  mix-blend-mode: screen;
+}
+
+/* Center label */
+.vinyl-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30%;
+  height: 30%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%,
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0.09) 55%,
+    rgba(255, 255, 255, 0.05) 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vinyl-hole {
+  width: 6%;
+  height: 6%;
+  border-radius: 50%;
+  background: #0A0A0A;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Mobile: a clear record on the right, vertically centred, mostly visible */
+@media (max-width: 768px) {
+  .vinyl-disc {
+    width: 86vw;
+    height: 86vw;
+    top: 50%;
+    right: -22vw;
+    left: auto;
+    transform: translateY(-50%);
+    animation-duration: 22s;
   }
+}
 
-  @keyframes glitch-anim-2 {
+/* Keep page content above the ambient layers */
+.ambient-bg > * {
+  position: relative;
+  z-index: 1;
+}
 
-    0%,
-    90%,
-    100% {
-      transform: translate(0);
-    }
+@keyframes ambient-drift {
+  from { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+  to { background-position: 0% 0%, 3% -2%, -3% 2%, 0% 0%; }
+}
 
-    91% {
-      transform: translate(-3px, 0);
-    }
+@keyframes vinyl-spin {
+  to { transform: rotate(360deg); }
+}
 
-    93% {
-      transform: translate(3px, 0);
-    }
+/* ── Entrance reveal (CSS-driven, runs on load — reliable above the fold) ── */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+.rise-in {
+  animation: rise-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes cue-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.cue-bounce {
+  animation: cue-bounce 1.8s ease-in-out infinite;
+}
+
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.caret-blink {
+  display: inline-block;
+  margin-left: 0.02em;
+  animation: caret-blink 0.9s step-end infinite;
+}
+
+/* ── Equalizer bars (album motif, pure CSS, no audio) ── */
+@keyframes eq-pulse {
+  0%, 100% { height: 25%; }
+  50% { height: 100%; }
+}
+
+.eq-bar {
+  height: 35%;
+  border-radius: 1px;
+  animation: eq-pulse 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar {
+    animation: none;
+    height: 55%;
   }
-
-  @keyframes glitch-anim-3 {
-
-    0%,
-    90%,
-    100% {
-      transform: translate(0);
-    }
-
-    92% {
-      transform: translate(3px, 0);
-    }
-
-    94% {
-      transform: translate(-3px, 0);
-    }
+  .rise-in,
+  .cue-bounce,
+  .caret-blink,
+  .ambient-bg,
+  .vinyl-disc,
+  .vinyl-layer {
+    animation: none;
   }
-
-  /* Flickering Light */
-  .flicker {
-    animation: flicker 4s infinite;
+  .vinyl-layer {
+    transform: none !important;
   }
-
-  @keyframes flicker {
-
-    0%,
-    100% {
-      opacity: 1;
-    }
-
-    41.99% {
-      opacity: 1;
-    }
-
-    42% {
-      opacity: 0.8;
-    }
-
-    43% {
-      opacity: 1;
-    }
-
-    45.99% {
-      opacity: 1;
-    }
-
-    46% {
-      opacity: 0.6;
-    }
-
-    46.5% {
-      opacity: 1;
-    }
-  }
-
-  /* Red Glow Border */
-  .red-glow-border {
-    box-shadow:
-      0 0 5px rgba(229, 9, 20, 0.5),
-      0 0 10px rgba(229, 9, 20, 0.3),
-      inset 0 0 5px rgba(229, 9, 20, 0.2);
-  }
-
-  /* Chromatic Aberration */
-  .chromatic {
-    position: relative;
-  }
-
-  .chromatic::before {
-    content: attr(data-text);
-    position: absolute;
-    left: 2px;
-    text-shadow: -2px 0 #ff0000;
-    top: 0;
-    color: transparent;
-    background: transparent;
-    overflow: hidden;
-    clip: rect(0, 900px, 0, 0);
-    animation: chromatic-anim 2s infinite linear alternate-reverse;
-  }
-
-  .chromatic::after {
-    content: attr(data-text);
-    position: absolute;
-    left: -2px;
-    text-shadow: 2px 0 #00ffff;
-    top: 0;
-    color: transparent;
-    background: transparent;
-    overflow: hidden;
-    clip: rect(0, 900px, 0, 0);
-    animation: chromatic-anim 3s infinite linear alternate-reverse;
-  }
-
-  @keyframes chromatic-anim {
-    0% {
-      clip: rect(42px, 9999px, 44px, 0);
-    }
-
-    5% {
-      clip: rect(12px, 9999px, 59px, 0);
-    }
-
-    10% {
-      clip: rect(48px, 9999px, 29px, 0);
-    }
-
-    /* ... more keyframes for variety */
-    100% {
-      clip: rect(25px, 9999px, 99px, 0);
-    }
-  }
-
-  /* Glitch-in Animation */
-  .glitch-in {
-    animation: glitch-in-anim 0.5s ease-out;
-  }
-
-  @keyframes glitch-in-anim {
-    0% {
-      opacity: 0;
-      transform: translateX(-100px) skew(-10deg);
-      filter: blur(10px);
-    }
-
-    20% {
-      opacity: 0.5;
-      transform: translateX(20px) skew(5deg);
-    }
-
-    40% {
-      opacity: 0.8;
-      transform: translateX(-10px) skew(-2deg);
-    }
-
-    60% {
-      opacity: 1;
-      transform: translateX(5px) skew(1deg);
-    }
-
-    100% {
-      opacity: 1;
-      transform: translateX(0) skew(0);
-      filter: blur(0);
-    }
+  html {
+    scroll-behavior: auto;
   }
 }

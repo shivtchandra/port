@@ -1,193 +1,193 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { Mail, Linkedin, Github, Twitter, ExternalLink, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowUpRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { FadeIn } from "@/components/ui/FadeIn";
+import { SectionShell, SectionTitle } from "@/components/ui/SectionShell";
+import { TrackLabel } from "@/components/ui/TrackLabel";
+import { WaveformDivider } from "@/components/ui/Waveform";
+
+const SOCIALS = [
+  {
+    label: "Email",
+    href: "mailto:shivachandra9490@gmail.com",
+    display: "shivachandra9490@gmail.com",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://linkedin.com/in/shiva-chandra-takkelapati-10ba3032b/",
+    display: "linkedin.com/in/shiva-chandra",
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/shivtchandra",
+    display: "github.com/shivtchandra",
+  },
+  {
+    label: "Medium",
+    href: "https://medium.com/@shivachandra9490",
+    display: "medium.com/@shivachandra9490",
+  },
+  {
+    label: "Spotify",
+    href: "https://open.spotify.com/user/5mwiefw3jc4vxqft713g2y0jl?si=80e58328902349bb",
+    display: "open.spotify.com · Shivachandra",
+  },
+];
+
+const inputClass =
+  "w-full bg-transparent border-0 border-b border-white/20 text-text text-base px-0 py-3 focus:outline-none focus:border-white transition-colors placeholder:text-text-muted/40";
 
 export default function Contact() {
-    const [input, setInput] = useState("");
-    const [glitch, setGlitch] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
-    const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        setInput(val);
-        if (val === "ENTER_THE_UPSIDE_DOWN") {
-            setGlitch(true);
-            setTimeout(() => {
-                setGlitch(false);
-                setInput("");
-                alert("WELCOME TO THE UPSIDE DOWN");
-            }, 500);
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus("idle");
 
-    const handleTransmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setStatus('idle');
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const message = formData.get("message") as string;
 
-        const formData = new FormData(e.currentTarget);
-        const name = formData.get('name') as string;
-        const email = formData.get('email') as string;
-        const message = formData.get('message') as string;
+    try {
+      await addDoc(collection(db, "transmissions"), {
+        name,
+        email,
+        message,
+        timestamp: serverTimestamp(),
+      });
+      setStatus("success");
+      (e.target as HTMLFormElement).reset();
+    } catch {
+      setStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-        try {
-            await addDoc(collection(db, "transmissions"), {
-                name,
-                email,
-                message,
-                timestamp: serverTimestamp()
-            });
+  return (
+    <SectionShell id="contact">
+      <FadeIn>
+        <TrackLabel num="06" name="Encore" />
+        <SectionTitle large className="mb-6 leading-[0.88]">
+          Let&apos;s work
+          <br />
+          together.
+        </SectionTitle>
+        <p className="text-text-muted text-base md:text-lg max-w-md mb-16">
+          Available for AI and full-stack engineering roles. Open to freelance projects.
+        </p>
+      </FadeIn>
 
-            setStatus('success');
-            (e.target as HTMLFormElement).reset();
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+        {/* Socials — hairline list */}
+        <FadeIn delay={0.1}>
+          <p className="text-[11px] text-text-muted uppercase tracking-[0.2em] mb-2">Elsewhere</p>
+          <div className="border-t border-white/10">
+            {SOCIALS.map(({ label, href, display }) => (
+              <a
+                key={label}
+                href={href}
+                target={href.startsWith("mailto") ? undefined : "_blank"}
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between gap-4 border-b border-white/10 py-5"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[11px] text-text-muted uppercase tracking-[0.2em] mb-1">
+                    {label}
+                  </span>
+                  <span className="block text-text text-sm md:text-base truncate transition-transform duration-300 group-hover:translate-x-1">
+                    {display}
+                  </span>
+                </span>
+                <ArrowUpRight
+                  size={20}
+                  className="shrink-0 text-text-muted transition-all duration-300 group-hover:text-text group-hover:translate-x-1 group-hover:-translate-y-1"
+                />
+              </a>
+            ))}
+          </div>
+        </FadeIn>
 
-            const mailtoUrl = `mailto:shivachandra9490@gmail.com?subject=Transmission from ${name}&body=${message} (Contact: ${email})`;
-            console.log("Transmission saved to Firebase. Link ready:", mailtoUrl);
+        {/* Form — underline fields */}
+        <FadeIn delay={0.2}>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div>
+                <label className="block text-[11px] text-text-muted uppercase tracking-[0.2em] mb-1">
+                  Name
+                </label>
+                <input name="name" required className={inputClass} placeholder="Your name" />
+              </div>
+              <div>
+                <label className="block text-[11px] text-text-muted uppercase tracking-[0.2em] mb-1">
+                  Email
+                </label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  className={inputClass}
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
 
-        } catch (err) {
-            console.error("Transmission failed:", err);
-            setStatus('error');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+            <div>
+              <label className="block text-[11px] text-text-muted uppercase tracking-[0.2em] mb-1">
+                Message
+              </label>
+              <textarea
+                name="message"
+                required
+                rows={4}
+                className={`${inputClass} resize-none`}
+                placeholder="Tell me about your project or role..."
+              />
+            </div>
 
-    return (
-        <section id="contact" className={`min-h-screen flex flex-col items-center justify-center p-3 sm:p-4 md:p-8 pt-20 sm:pt-10 relative z-10 vhs-scanlines transition-all duration-300 ${glitch ? 'invert' : ''}`}>
-            <motion.h2
-                initial={{ opacity: 0, y: -20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                className="text-3xl sm:text-4xl md:text-6xl font-black uppercase mb-6 md:mb-12 text-off-white tracking-tighter text-glow flicker glitch leading-tight text-center"
-                data-text="PORTAL TERMINAL"
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto px-10 py-3.5 bg-accent text-bg font-semibold text-sm tracking-wide hover:bg-accent/90 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
-                PORTAL <span className="text-neon-red">TERMINAL</span>
-            </motion.h2>
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Sending…
+                </>
+              ) : (
+                "Send Message"
+              )}
+            </button>
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-2xl bg-black border-2 border-neon-red/50 p-4 sm:p-6 rounded-lg shadow-[0_0_20px_rgba(229,9,20,0.2)] font-mono red-glow-border glitch-in overflow-hidden"
-            >
-                <div className="flex items-center gap-2 mb-4 md:mb-6 border-b border-neon-red/20 pb-4">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 animate-pulse"></div>
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
-                    <span className="ml-auto text-neon-red text-[8px] sm:text-xs tracking-[0.2em] sm:tracking-widest">COMM_UPLINK_V4.0</span>
-                </div>
+            {status === "success" && (
+              <div className="flex items-center gap-2 text-sm text-green-400">
+                <CheckCircle2 size={16} />
+                Message sent. I&apos;ll get back to you soon.
+              </div>
+            )}
+            {status === "error" && (
+              <div className="flex items-center gap-2 text-sm text-red-400">
+                <AlertCircle size={16} />
+                Something went wrong. Try emailing directly.
+              </div>
+            )}
+          </form>
+        </FadeIn>
+      </div>
 
-                <div className="space-y-1 sm:space-y-2 text-green-500 text-[10px] sm:text-sm mb-6 sm:mb-8 font-mono">
-                    <p className="typing-effect">{">"} establishing_connection...</p>
-                    <p className="typing-effect delay-1000 hidden sm:block">{">"} channel_open</p>
-                    <p className="typing-effect delay-2000">{status === 'success' ? "> transmission_received" : "> awaiting_input..."}</p>
-                    {status === 'error' && <p className="text-neon-red">{">"} signal_interference_detected. retry_transmission.</p>}
-                </div>
-
-                <form
-                    className="space-y-6"
-                    onSubmit={handleTransmit}
-                >
-                    <div>
-                        <label className="block text-neon-red text-xs uppercase tracking-widest mb-2">Identity</label>
-                        <input name="name" id="name" type="text" required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER NAME" />
-                    </div>
-                    <div>
-                        <label className="block text-neon-red text-xs uppercase tracking-widest mb-2">Frequency</label>
-                        <input name="email" id="email" type="email" required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER EMAIL" />
-                    </div>
-                    <div>
-                        <label className="block text-neon-red text-xs uppercase tracking-widest mb-2">Transmission</label>
-                        <textarea name="message" id="message" rows={4} required className="w-full bg-black border border-neon-red/30 p-3 text-off-white focus:border-neon-red focus:outline-none transition-colors font-mono" placeholder="ENTER MESSAGE"></textarea>
-                    </div>
-
-                    {/* Easter Egg Input */}
-                    <div className="pt-4 border-t border-neon-red/20">
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={handleInput}
-                            className="w-full bg-transparent text-center text-xs text-off-white/30 focus:text-neon-red focus:outline-none uppercase tracking-widest font-mono"
-                            placeholder="> ENTER_COMMAND"
-                        />
-                    </div>
-
-                    <button
-                        disabled={isSubmitting}
-                        type="submit"
-                        className="w-full bg-neon-red text-black font-bold uppercase py-4 tracking-widest hover:bg-red-600 transition-colors relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <span className="relative z-10 flex items-center justify-center gap-2">
-                            {isSubmitting ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : status === 'success' ? (
-                                <CheckCircle2 className="w-5 h-5" />
-                            ) : (
-                                "Transmit Signal"
-                            )}
-                        </span>
-                        <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                    </button>
-                </form>
-
-                {/* Social Links / Reach Out Options */}
-                <div className="mt-8 pt-8 border-t border-neon-red/20">
-                    <p className="text-neon-red text-xs uppercase tracking-widest mb-4 text-center">
-                        {">"} Alternative_Channels
-                    </p>
-                    <div className="grid grid-cols-2 gap-3">
-                        {/* Email */}
-                        <a
-                            href="mailto:shivachandra9490@gmail.com"
-                            className="group flex items-center gap-2 bg-black border border-neon-red/30 p-3 hover:border-neon-red hover:bg-neon-red/10 transition-all duration-300"
-                        >
-                            <Mail className="w-4 h-4 text-neon-red group-hover:scale-110 transition-transform" />
-                            <span className="text-off-white text-xs uppercase tracking-wider font-mono">Email</span>
-                            <ExternalLink className="w-3 h-3 text-neon-red/50 ml-auto" />
-                        </a>
-
-                        {/* LinkedIn */}
-                        <a
-                            href="https://www.linkedin.com/in/shiva-chandra-takkelapati-10ba3032b/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-center gap-2 bg-black border border-neon-red/30 p-3 hover:border-neon-red hover:bg-neon-red/10 transition-all duration-300"
-                        >
-                            <Linkedin className="w-4 h-4 text-neon-red group-hover:scale-110 transition-transform" />
-                            <span className="text-off-white text-xs uppercase tracking-wider font-mono">LinkedIn</span>
-                            <ExternalLink className="w-3 h-3 text-neon-red/50 ml-auto" />
-                        </a>
-
-                        {/* GitHub */}
-                        <a
-                            href="https://github.com/shivtchandra"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-center gap-2 bg-black border border-neon-red/30 p-3 hover:border-neon-red hover:bg-neon-red/10 transition-all duration-300"
-                        >
-                            <Github className="w-4 h-4 text-neon-red group-hover:scale-110 transition-transform" />
-                            <span className="text-off-white text-xs uppercase tracking-wider font-mono">GitHub</span>
-                            <ExternalLink className="w-3 h-3 text-neon-red/50 ml-auto" />
-                        </a>
-
-                        {/* Medium */}
-                        <a
-                            href="https://medium.com/@shivachandra9490"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-center gap-2 bg-black border border-neon-red/30 p-3 hover:border-neon-red hover:bg-neon-red/10 transition-all duration-300"
-                        >
-                            <div className="w-4 h-4 flex items-center justify-center text-neon-red font-bold text-[10px] border border-neon-red rounded-sm group-hover:scale-110 transition-transform">M</div>
-                            <span className="text-off-white text-xs uppercase tracking-wider font-mono">Medium</span>
-                            <ExternalLink className="w-3 h-3 text-neon-red/50 ml-auto" />
-                        </a>
-                    </div>
-                </div>
-            </motion.div>
-        </section>
-    );
+      {/* Outro — fade out */}
+      <div className="mt-24 md:mt-32">
+        <WaveformDivider />
+        <p className="mt-6 text-center text-[10px] tracking-[0.3em] uppercase text-text-muted/60">
+          End of Side B · Vol. 2026
+        </p>
+      </div>
+    </SectionShell>
+  );
 }

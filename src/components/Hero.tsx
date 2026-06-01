@@ -1,209 +1,123 @@
 "use client";
 
-import { Scroll, useScroll } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
 import { useState } from "react";
-import { FlaskConical, FolderOpen } from "lucide-react";
-import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { TrackLabel } from "@/components/ui/TrackLabel";
+import { Typewriter } from "@/components/ui/Typewriter";
+import { WaveformDivider } from "@/components/ui/Waveform";
+import { scrollToSection } from "@/components/SmoothScroll";
+
+const META = ["AI & Full-Stack Engineer", "Hyderabad, IN", "Available 2026"];
+
+const NAME_STYLE: React.CSSProperties = {
+  fontSize: "clamp(52px, 11vw, 150px)",
+  lineHeight: 0.88,
+  letterSpacing: "-0.04em",
+};
+
+function reveal(done: boolean, delay?: string) {
+  return {
+    className: done ? "rise-in" : "opacity-0",
+    style: done && delay ? { animationDelay: delay } : undefined,
+  };
+}
 
 export default function Hero() {
-    const scroll = useScroll();
-    const [opacity, setOpacity] = useState(1);
-    const [staticIntensity, setStaticIntensity] = useState(1);
-    const [noiseLinePosition, setNoiseLinePosition] = useState(0);
-    const [tunedLetters, setTunedLetters] = useState(0);
+  const [line1Done, setLine1Done] = useState(false);
+  const [nameDone, setNameDone] = useState(false);
 
-    const name = "SHIVA CHANDRA T";
+  return (
+    <section
+      id="hero"
+      className="relative min-h-screen flex flex-col overflow-hidden scroll-mt-20"
+    >
+      <div className="relative z-10 flex-1 flex flex-col justify-between px-6 md:px-12 lg:px-20 xl:px-24 max-w-7xl mx-auto w-full pt-28 pb-20">
+        <div
+          className="rise-in flex items-center justify-between"
+          style={{ animationDelay: "0.1s" }}
+        >
+          <TrackLabel num="01" name="Opening" className="!mb-0" />
+          <span className="text-[11px] tracking-[0.28em] uppercase text-text-muted">
+            Vol. 2026
+          </span>
+        </div>
 
-    useEffect(() => {
-        // Animate static intensity
-        const staticInterval = setInterval(() => {
-            setStaticIntensity(Math.random());
-        }, 50);
+        <div className="flex-1 flex flex-col justify-center py-8">
+          <span
+            {...reveal(nameDone, "0s")}
+            className={`${reveal(nameDone).className} block text-[11px] md:text-xs tracking-[0.3em] uppercase text-text-muted mb-6`}
+            style={reveal(nameDone, "0s").style}
+          >
+            LP · Systems That Think
+          </span>
+          <h1 className="font-display font-extrabold text-text min-h-[2.2em]" style={NAME_STYLE}>
+            {line1Done ? (
+              <span>Shiva</span>
+            ) : (
+              <Typewriter text="Shiva" speed={58} onComplete={() => setLine1Done(true)} />
+            )}
+            <br />
+            {line1Done &&
+              (nameDone ? (
+                <span>Chandra</span>
+              ) : (
+                <Typewriter text="Chandra" speed={58} onComplete={() => setNameDone(true)} />
+              ))}
+          </h1>
+        </div>
 
-        // Animate horizontal noise lines
-        const noiseInterval = setInterval(() => {
-            setNoiseLinePosition(Math.random() * 100);
-        }, 150);
-
-        // Letter-by-letter tune-in effect
-        const letterInterval = setInterval(() => {
-            setTunedLetters((prev) => {
-                if (prev < name.length) return prev + 1;
-                return prev;
-            });
-        }, 80);
-
-        return () => {
-            clearInterval(staticInterval);
-            clearInterval(noiseInterval);
-            clearInterval(letterInterval);
-        };
-    }, []);
-
-    useFrame(() => {
-        // Fade out hero text as we scroll
-        setOpacity(1 - scroll.range(0, 0.2));
-    });
-
-    const scrollToSection = (sectionId: string) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    };
-
-    return (
-        <Scroll html>
-            <div
-                className="w-screen h-screen flex flex-col items-center justify-center pointer-events-none"
-                style={{ opacity }}
-            >
-                <div className="relative z-10 text-center px-4 w-full flex flex-col items-center">
-                    {/* Main Heading with Radio Static Effect */}
-                    <div className="relative mb-6 w-full">
-                        {/* Background glow */}
-                        <motion.div
-                            animate={{
-                                scale: [1, 1.2, 1],
-                                opacity: [0.3, 0.5, 0.3],
-                            }}
-                            transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                            }}
-                            className="absolute inset-0 blur-3xl bg-neon-red/20 -z-10"
-                        />
-
-                        {/* Horizontal Noise Lines */}
-                        <div
-                            className="absolute inset-0 pointer-events-none z-20 overflow-hidden"
-                            style={{
-                                background: `linear-gradient(to bottom, transparent ${noiseLinePosition}%, rgba(229, 9, 20, 0.4) ${noiseLinePosition}%, rgba(229, 9, 20, 0.4) ${noiseLinePosition + 1}%, transparent ${noiseLinePosition + 1}%)`,
-                                mixBlendMode: "screen",
-                            }}
-                        />
-
-                        <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-off-white leading-tight">
-                            <span className="block text-glow chromatic opacity-70 text-[8px] sm:text-xs md:text-base mb-2 tracking-[0.2em] sm:tracking-[0.4em] md:tracking-[0.5em]" data-text="WELCOME TO THE UPSIDE DOWN">
-                                WELCOME TO THE UPSIDE DOWN
-                            </span>
-
-                            <div className="relative inline-block w-full">
-                                {/* Intense Radio Static Effect Layers */}
-                                <span
-                                    className="absolute inset-0 text-neon-red select-none hidden md:block"
-                                    style={{
-                                        clipPath: `inset(${Math.random() * 100}% 0 ${Math.random() * 100}% 0)`,
-                                        transform: `translateX(${staticIntensity * 4 - 2}px) skew(${staticIntensity}deg)`,
-                                        opacity: staticIntensity * 0.5,
-                                    }}
-                                >
-                                    {name}
-                                </span>
-                                <span
-                                    className="absolute inset-0 text-cyan-400 select-none hidden md:block"
-                                    style={{
-                                        clipPath: `inset(${Math.random() * 100}% 0 ${Math.random() * 100}% 0)`,
-                                        transform: `translateX(${-staticIntensity * 4 + 2}px) skew(${-staticIntensity}deg)`,
-                                        opacity: staticIntensity * 0.3,
-                                    }}
-                                >
-                                    {name}
-                                </span>
-
-                                {/* Main text with letter-by-letter reveal */}
-                                <span className="relative text-neon-red text-3xl sm:text-5xl md:text-7xl lg:text-8xl glitch break-words !leading-tight sm:!leading-normal" data-text={name}>
-                                    {name.split("").map((letter, i) => (
-                                        <motion.span
-                                            key={i}
-                                            initial={{
-                                                opacity: 0,
-                                                filter: "blur(10px)",
-                                            }}
-                                            animate={{
-                                                opacity: i < tunedLetters ? 1 : 0.2,
-                                                filter: i < tunedLetters ? "blur(0px)" : "blur(8px)",
-                                            }}
-                                            transition={{ duration: 0.1 }}
-                                            style={{
-                                                display: "inline-block",
-                                                textShadow: i < tunedLetters ? "0 0 15px rgba(229, 9, 20, 0.8)" : "none",
-                                            }}
-                                        >
-                                            {letter === " " ? "\u00A0" : letter}
-                                        </motion.span>
-                                    ))}
-                                </span>
-                            </div>
-                        </h1>
-                    </div>
-
-                    {/* Subheading */}
-                    <p className="text-off-white/80 font-mono text-[9px] sm:text-xs md:text-base lg:text-lg tracking-wider mb-8 md:mb-12 uppercase max-w-[280px] sm:max-w-none mx-auto leading-relaxed">
-                        Multicloud Engineer <span className="text-neon-red sm:inline text-[8px] sm:text-base">•</span> Full-Stack Craft <br className="sm:hidden" /> <span className="text-neon-red hidden sm:inline">•</span> AI Engineering
-                    </p>
-
-                    {/* Action Buttons with 3D Hover Tilt */}
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 pointer-events-auto justify-center items-center px-4 w-full max-w-sm mx-auto sm:max-w-none">
-                        <button
-                            onClick={() => scrollToSection('projects')}
-                            className="group relative px-6 py-4 sm:py-3 border-2 border-neon-red text-neon-red hover:text-black transition-all duration-300 font-bold tracking-widest uppercase text-xs sm:text-sm overflow-hidden perspective-1000 w-full sm:w-auto"
-                            style={{
-                                transformStyle: 'preserve-3d',
-                            }}
-                            onMouseMove={(e) => {
-                                if (window.innerWidth < 640) return;
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                const x = e.clientX - rect.left;
-                                const y = e.clientY - rect.top;
-                                const centerX = rect.width / 2;
-                                const centerY = rect.height / 2;
-                                const rotateX = (y - centerY) / 10;
-                                const rotateY = (centerX - x) / 10;
-                                e.currentTarget.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
-                            }}
-                        >
-                            <span className="relative z-10 flex items-center gap-2 justify-center">
-                                <FlaskConical className="w-4 h-4" />
-                                View Experiments
-                            </span>
-                            <div className="absolute inset-0 bg-neon-red transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
-                        </button>
-
-                        <button
-                            onClick={() => scrollToSection('about')}
-                            className="group relative px-6 py-4 sm:py-3 border-2 border-off-white/30 text-off-white hover:border-neon-red hover:text-neon-red transition-all duration-300 font-bold tracking-widest uppercase text-xs sm:text-sm perspective-1000 w-full sm:w-auto"
-                            style={{
-                                transformStyle: 'preserve-3d',
-                            }}
-                            onMouseMove={(e) => {
-                                if (window.innerWidth < 640) return;
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                const x = e.clientX - rect.left;
-                                const y = e.clientY - rect.top;
-                                const centerX = rect.width / 2;
-                                const centerY = rect.height / 2;
-                                const rotateX = (y - centerY) / 10;
-                                const rotateY = (centerX - x) / 10;
-                                e.currentTarget.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
-                            }}
-                        >
-                            <span className="relative z-10 flex items-center gap-2 justify-center">
-                                <FolderOpen className="w-4 h-4" />
-                                Open Case Files
-                            </span>
-                        </button>
-                    </div>
-                </div>
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+          <div {...reveal(nameDone, "0.1s")} className={reveal(nameDone).className}>
+            <div className="max-w-md">
+              <p className="text-text-muted text-base md:text-lg leading-relaxed mb-6">
+                Building systems that think — from production APIs to shipped AI products.
+              </p>
+              <div className="flex flex-wrap gap-x-7 gap-y-2 text-[11px] tracking-[0.2em] uppercase text-text-muted">
+                {META.map((m) => (
+                  <span key={m}>{m}</span>
+                ))}
+              </div>
             </div>
-        </Scroll>
-    );
+          </div>
+
+          <div {...reveal(nameDone, "0.22s")} className={reveal(nameDone).className}>
+            <div className="flex items-center gap-6 shrink-0">
+              <button
+                onClick={() => scrollToSection("selected-work")}
+                className="px-7 py-3.5 bg-accent text-bg font-semibold text-sm tracking-wide hover:bg-accent/90 transition-colors duration-200"
+              >
+                Play the Hits
+              </button>
+              <button
+                onClick={() => scrollToSection("contact")}
+                className="group inline-flex items-center gap-1.5 text-sm font-medium text-text tracking-wide"
+              >
+                Get in touch
+                <ArrowUpRight
+                  size={16}
+                  className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div {...reveal(nameDone, "0.34s")} className={`${reveal(nameDone).className} mt-10 text-white/10`}>
+          <WaveformDivider />
+        </div>
+      </div>
+
+      <button
+        onClick={() => scrollToSection("selected-work")}
+        {...reveal(nameDone, "0.5s")}
+        className={`${reveal(nameDone).className} absolute bottom-24 left-0 right-0 mx-auto w-fit z-10 flex flex-col items-center gap-2 text-[10px] tracking-[0.25em] uppercase text-text-muted/70`}
+        style={reveal(nameDone, "0.5s").style}
+      >
+        Side A below
+        <span className="cue-bounce">
+          <ArrowDown size={16} />
+        </span>
+      </button>
+    </section>
+  );
 }

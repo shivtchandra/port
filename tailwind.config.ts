@@ -9,15 +9,20 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                background: "var(--background)",
-                foreground: "var(--foreground)",
-                "neon-red": "#E50914",
-                "glow-red": "#E50A15",
-                "off-white": "#E3E3E3",
-                accent: "#E50914",
+                bg: "#0A0A0A",
+                surface: "#111111",
+                "surface-raised": "#161616",
+                border: "rgba(255,255,255,0.10)",
+                text: "#FAFAFA",
+                "text-muted": "#7A7A7A",
+                accent: "#FAFAFA",
+                "accent-glow": "rgba(255,255,255,0.08)",
+                background: "var(--color-background)",
+                foreground: "var(--color-foreground)",
             },
             fontFamily: {
-                sans: ["var(--font-red-hat-display)", "sans-serif"],
+                display: ["var(--font-unbounded)", "sans-serif"],
+                sans: ["var(--font-inter)", "sans-serif"],
             },
         },
     },

@@ -1,16 +1,28 @@
 import type { Metadata } from "next";
-import { Red_Hat_Display } from "next/font/google";
+import { Unbounded, Inter } from "next/font/google";
 import "./globals.css";
+import CustomCursor from "@/components/CustomCursor";
+import SmoothScroll from "@/components/SmoothScroll";
+import NowPlaying from "@/components/NowPlaying";
+import { VinylDisc } from "@/components/ui/VinylDisc";
 
-const redHat = Red_Hat_Display({
+const unbounded = Unbounded({
   subsets: ["latin"],
-  variable: "--font-red-hat-display",
-  weight: ["400", "500", "700", "900"],
+  variable: "--font-unbounded",
+  weight: ["400", "500", "700", "800"],
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ST | TACTICAL_REPORT",
-  description: "Front-End Craft • AI Engineering • Creative Technologist",
+  title: "Shiva Chandra | AI & Full-Stack Engineer",
+  description: "Building AI systems and production-grade full-stack applications.",
 };
 
 export default function RootLayout({
@@ -19,12 +31,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${unbounded.variable} ${inter.variable}`}>
       <body
-        className={`${redHat.variable} font-sans bg-black text-off-white antialiased overflow-x-hidden selection:bg-accent selection:text-black`}
+        className="font-sans bg-bg text-text antialiased overflow-x-hidden"
       >
+        <CustomCursor />
+        <div className="ambient-bg fixed inset-0 -z-10 pointer-events-none" />
+        <VinylDisc />
         <div className="fixed inset-0 z-50 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('/noise.png')]"></div>
-        {children}
+        <SmoothScroll>
+          <div className="relative z-10">{children}</div>
+        </SmoothScroll>
+        <NowPlaying />
       </body>
     </html>
   );
