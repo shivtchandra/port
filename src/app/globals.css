@@ -191,13 +191,13 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-/* Mobile: a clear record on the right, vertically centred, mostly visible */
+/* Mobile: smaller record, pushed further right so it reads as texture, not foreground */
 @media (max-width: 768px) {
   .vinyl-disc {
-    width: 86vw;
-    height: 86vw;
+    width: 72vw;
+    height: 72vw;
     top: 50%;
-    right: -22vw;
+    right: -30vw;
     left: auto;
     transform: translateY(-50%);
     animation-duration: 22s;

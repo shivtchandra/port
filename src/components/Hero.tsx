@@ -52,7 +52,7 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex flex-col overflow-hidden scroll-mt-20"
     >
-      <div className="relative z-10 flex-1 flex flex-col justify-between px-6 md:px-12 lg:px-20 xl:px-24 max-w-7xl mx-auto w-full pt-28 pb-20">
+      <div className="relative z-10 flex-1 flex flex-col justify-between px-6 md:px-12 lg:px-20 xl:px-24 max-w-7xl mx-auto w-full pt-16 md:pt-24 lg:pt-28 pb-20">
         <div
           className="rise-in flex items-center justify-between"
           style={{ animationDelay: "0.1s" }}

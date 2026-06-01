@@ -9,11 +9,13 @@ const OPACITY_MOBILE_FLOOR = 0.28;
 const SPIN_SPEED = 360 / 16000; // degrees per ms
 
 function opacityForScroll(scrollY: number, heroHeight: number, isMobile: boolean): number {
+  // On mobile the vinyl is a background texture — cap it lower so it doesn't compete with text
+  const opacityFull = isMobile ? 0.48 : OPACITY_FULL;
   if (heroHeight <= 0) return OPACITY_FLOOR;
   const fadeEnd = heroHeight * 1.4;
   const t = Math.min(1, Math.max(0, scrollY / fadeEnd));
   const eased = t * t * (3 - 2 * t);
-  const opacity = OPACITY_FULL - eased * (OPACITY_FULL - OPACITY_FLOOR);
+  const opacity = opacityFull - eased * (opacityFull - OPACITY_FLOOR);
   const floor = isMobile ? OPACITY_MOBILE_FLOOR : OPACITY_FLOOR;
   return Math.max(floor, opacity);
 }

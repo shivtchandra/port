@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useMagnet } from "@/hooks/useMagnet";
 import { TrackLabel } from "@/components/ui/TrackLabel";
 import { WaveformDivider } from "@/components/ui/Waveform";
+import { PhotoBooth } from "@/components/PhotoBooth";
 
 const SOCIALS = [
   {
@@ -76,6 +77,7 @@ export default function Contact() {
 
   return (
     <SectionShell id="contact">
+      <PhotoBooth />
       <FadeIn>
         <TrackLabel num="06" name="Encore" />
         <SectionTitle large className="mb-6 leading-[0.88]">
