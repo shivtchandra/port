@@ -6,6 +6,7 @@ import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { SectionShell, SectionTitle } from "@/components/ui/SectionShell";
+import { ScrambleText } from "@/components/ui/ScrambleText";
 import { TrackLabel } from "@/components/ui/TrackLabel";
 
 const STATIC_EXPERIENCES = [
@@ -85,7 +86,7 @@ export default function Experience() {
     <SectionShell id="experience">
       <FadeIn className="mb-12 md:mb-16">
         <TrackLabel num="03" name="Tour History" />
-        <SectionTitle>Where I&apos;ve Worked</SectionTitle>
+        <SectionTitle><ScrambleText text="Where I've Worked" /></SectionTitle>
       </FadeIn>
 
       {loading ? (

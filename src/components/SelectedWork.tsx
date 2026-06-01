@@ -2,6 +2,7 @@
 
 import { FadeIn } from "@/components/ui/FadeIn";
 import { SectionShell, SectionTitle } from "@/components/ui/SectionShell";
+import { ScrambleText } from "@/components/ui/ScrambleText";
 import { TrackLabel } from "@/components/ui/TrackLabel";
 import { Equalizer } from "@/components/ui/Equalizer";
 import { FeaturedProjectCard } from "@/components/FeaturedProjectCard";
@@ -66,7 +67,7 @@ export default function SelectedWork() {
     <SectionShell id="selected-work" variant="first">
       <FadeIn className="mb-4 md:mb-6">
         <TrackLabel num="02" name="The Hits" />
-        <SectionTitle>What I&apos;ve Built</SectionTitle>
+        <SectionTitle><ScrambleText text="What I've Built" /></SectionTitle>
         <p className="text-text-muted text-base md:text-lg leading-relaxed mt-6 max-w-2xl">
           Production client platforms, AI products, and shipped mobile apps — from
           architecture through deployment.

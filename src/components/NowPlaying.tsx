@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Play, Pause } from "lucide-react";
 import { Equalizer } from "@/components/ui/Equalizer";
 import {
@@ -18,47 +18,83 @@ function getScrollY() {
 }
 
 export default function NowPlaying() {
-  const [progress, setProgress] = useState(0);
   const [active, setActive] = useState(0);
   const [tourPlaying, setTourPlaying] = useState(false);
-  const [activeSide, setActiveSide] = useState<AlbumSide | null>(null);
+  const [activeSide, setActiveSide] = useState<AlbumSide>("a");
+
+  // Direct DOM refs — progress bars and dots update without React re-renders
+  const topBarRef = useRef<HTMLDivElement>(null);
+  const scrubLineRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const activeRef = useRef(0);
+  const nativeRafRef = useRef(0);
 
   useEffect(() => subscribeTour(setTourPlaying), []);
 
-  useEffect(() => {
-    const update = () => {
-      const scrollY = getScrollY();
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(max > 0 ? Math.min(1, scrollY / max) : 0);
+  const update = useCallback(() => {
+    const scrollY = getScrollY();
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const prog = max > 0 ? Math.min(1, scrollY / max) : 0;
 
-      const mid = window.innerHeight / 2;
-      let current = 0;
-      TRACKS.forEach((t, i) => {
-        const el = document.getElementById(t.id);
-        if (el && el.getBoundingClientRect().top <= mid) current = i;
-      });
-      setActive(current);
+    // Update progress bars instantly — no CSS transition
+    const pct = `${prog * 100}%`;
+    if (topBarRef.current) topBarRef.current.style.width = pct;
+    if (scrubLineRef.current) scrubLineRef.current.style.width = pct;
 
-      const sideBEl = document.getElementById("side-b");
-      if (sideBEl && sideBEl.getBoundingClientRect().top <= mid) {
-        setActiveSide("b");
+    // Determine active track — last whose top edge is above 45% of viewport
+    const threshold = window.innerHeight * 0.45;
+    let current = 0;
+    for (let i = 0; i < TRACKS.length; i++) {
+      const el = document.getElementById(TRACKS[i].id);
+      if (el && el.getBoundingClientRect().top <= threshold) current = i;
+    }
+
+    // Update dots directly — instant, no transition
+    dotRefs.current.forEach((dot, i) => {
+      if (!dot) return;
+      if (i < current) {
+        dot.className = "block w-2 h-2 rounded-full border bg-text border-text scale-100";
+      } else if (i === current) {
+        dot.className = "block w-2 h-2 rounded-full border bg-text border-text scale-150";
       } else {
-        setActiveSide("a");
+        dot.className = "block w-2 h-2 rounded-full border bg-transparent border-white/30";
       }
+    });
+
+    // Only fire React setState when the active track actually changes
+    if (current !== activeRef.current) {
+      activeRef.current = current;
+      setActive(current);
+    }
+
+    // Side detection
+    const sideBEl = document.getElementById("side-b");
+    const newSide: AlbumSide =
+      sideBEl && sideBEl.getBoundingClientRect().top <= threshold ? "b" : "a";
+    setActiveSide((prev) => (prev === newSide ? prev : newSide));
+  }, []);
+
+  useEffect(() => {
+    // Native scroll: deduplicate with cancelable RAF
+    const onNativeScroll = () => {
+      if (nativeRafRef.current) cancelAnimationFrame(nativeRafRef.current);
+      nativeRafRef.current = requestAnimationFrame(() => {
+        nativeRafRef.current = 0;
+        update();
+      });
     };
 
-    const onScroll = () => requestAnimationFrame(update);
     update();
+    window.addEventListener("scroll", onNativeScroll, { passive: true });
+    window.addEventListener("resize", onNativeScroll);
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
+    // Lenis: fire update directly — Lenis already runs inside RAF
     let lenisCleanup: (() => void) | undefined;
     const bindLenis = () => {
       const lenis = lenisRef.current;
       if (!lenis) return;
-      lenis.on("scroll", onScroll);
-      lenisCleanup = () => lenis.off("scroll", onScroll);
+      lenis.on("scroll", update);
+      lenisCleanup = () => lenis.off("scroll", update);
     };
     bindLenis();
     const poll = window.setInterval(() => {
@@ -73,10 +109,11 @@ export default function NowPlaying() {
     return () => {
       clearInterval(poll);
       lenisCleanup?.();
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      if (nativeRafRef.current) cancelAnimationFrame(nativeRafRef.current);
+      window.removeEventListener("scroll", onNativeScroll);
+      window.removeEventListener("resize", onNativeScroll);
     };
-  }, []);
+  }, [update]);
 
   const track = TRACKS[active];
 
@@ -91,29 +128,21 @@ export default function NowPlaying() {
   };
 
   const handlePlay = () => {
-    if (tourPlaying) {
-      stopGuidedTour();
-      return;
-    }
+    if (tourPlaying) { stopGuidedTour(); return; }
     startGuidedTour("full");
   };
 
   const handlePlaySide = (side: AlbumSide) => {
-    if (tourPlaying && activeSide === side) {
-      stopGuidedTour();
-      return;
-    }
+    if (tourPlaying && activeSide === side) { stopGuidedTour(); return; }
     stopGuidedTour();
     startGuidedTour(side);
   };
 
   return (
     <div className="fixed bottom-0 left-0 w-full z-[100] pointer-events-none">
+      {/* Top progress bar — updated via DOM ref, no CSS transition */}
       <div className="h-px w-full bg-white/10">
-        <div
-          className="h-full bg-text origin-left transition-[width] duration-150"
-          style={{ width: `${progress * 100}%` }}
-        />
+        <div ref={topBarRef} className="h-full bg-text" style={{ width: "0%" }} />
       </div>
 
       <div className="pointer-events-auto bg-bg/80 backdrop-blur-md border-t border-white/10">
@@ -166,11 +195,13 @@ export default function NowPlaying() {
             </div>
           </div>
 
+          {/* Scrubber — dots updated via DOM refs */}
           <div className="relative flex-1 h-9 flex items-center min-w-0">
             <div className="absolute inset-x-0 h-px bg-white/12" />
             <div
-              className="absolute left-0 h-px bg-text transition-[width] duration-150"
-              style={{ width: `${progress * 100}%` }}
+              ref={scrubLineRef}
+              className="absolute left-0 h-px bg-text"
+              style={{ width: "0%" }}
             />
             {TRACKS.map((t, i) => (
               <button
@@ -182,11 +213,14 @@ export default function NowPlaying() {
                 style={{ left: `${(i / (TRACKS.length - 1)) * 100}%` }}
               >
                 <span
-                  className={`block w-2 h-2 rounded-full border transition-all duration-300 ${
-                    i <= active
-                      ? "bg-text border-text"
-                      : "bg-transparent border-white/30 group-hover:border-white/60"
-                  } ${i === active ? "scale-150" : ""}`}
+                  ref={(el) => { dotRefs.current[i] = el; }}
+                  className={`block w-2 h-2 rounded-full border ${
+                    i < active
+                      ? "bg-text border-text scale-100"
+                      : i === active
+                      ? "bg-text border-text scale-150"
+                      : "bg-transparent border-white/30"
+                  }`}
                 />
                 <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] tracking-[0.18em] uppercase text-text-muted opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                   {t.name}

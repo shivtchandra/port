@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import type { Project } from "@/lib/projects";
 import { isValidUrl, projectThumb } from "@/lib/projects";
@@ -65,6 +65,30 @@ export function FeaturedProjectCard({ project }: { project: Project }) {
   const outcome = project.outcome ?? project.impact;
   const primaryHref = demo ?? github;
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isFine = useRef(false);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0, sx: 50, sy: 50, active: false });
+
+  useEffect(() => {
+    isFine.current = window.matchMedia("(pointer: fine)").matches;
+  }, []);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!isFine.current) return;
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rx = -((y - rect.height / 2) / (rect.height / 2)) * 6;
+    const ry = ((x - rect.width / 2) / (rect.width / 2)) * 8;
+    setTilt({ rx, ry, sx: (x / rect.width) * 100, sy: (y / rect.height) * 100, active: true });
+  }
+
+  function handleMouseLeave() {
+    setTilt({ rx: 0, ry: 0, sx: 50, sy: 50, active: false });
+  }
+
   const titleInner = (
     <h3
       className="font-display font-bold text-text leading-[0.95] group-hover:translate-x-1 transition-transform duration-300"
@@ -75,7 +99,30 @@ export function FeaturedProjectCard({ project }: { project: Project }) {
   );
 
   return (
-    <article className="group block">
+    <div
+      ref={cardRef}
+      className="group relative block"
+      style={{
+        transform: `perspective(900px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+        transition: tilt.active
+          ? "transform 0.08s linear"
+          : "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        transformStyle: "preserve-3d",
+        willChange: "transform",
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Holographic sheen overlay */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background: tilt.active
+            ? `radial-gradient(circle at ${tilt.sx}% ${tilt.sy}%, rgba(255,255,255,0.09), transparent 55%)`
+            : "none",
+        }}
+      />
+
       {primaryHref ? (
         <a href={primaryHref} target="_blank" rel="noopener noreferrer" className="block">
           <ProjectThumb
@@ -123,6 +170,6 @@ export function FeaturedProjectCard({ project }: { project: Project }) {
           {github && <LinkChip href={github} label="GitHub" />}
         </div>
       </div>
-    </article>
+    </div>
   );
 }

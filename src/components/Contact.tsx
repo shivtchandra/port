@@ -6,6 +6,9 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ArrowUpRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { SectionShell, SectionTitle } from "@/components/ui/SectionShell";
+import { ScrambleText } from "@/components/ui/ScrambleText";
+import { motion } from "framer-motion";
+import { useMagnet } from "@/hooks/useMagnet";
 import { TrackLabel } from "@/components/ui/TrackLabel";
 import { WaveformDivider } from "@/components/ui/Waveform";
 
@@ -43,6 +46,7 @@ const inputClass =
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const sendMagnet = useMagnet();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,9 +79,9 @@ export default function Contact() {
       <FadeIn>
         <TrackLabel num="06" name="Encore" />
         <SectionTitle large className="mb-6 leading-[0.88]">
-          Let&apos;s work
+          <ScrambleText text="Let's work" />
           <br />
-          together.
+          <ScrambleText text="together." />
         </SectionTitle>
         <p className="text-text-muted text-base md:text-lg max-w-md mb-16">
           Available for AI and full-stack engineering roles. Open to freelance projects.
@@ -151,19 +155,27 @@ export default function Contact() {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full sm:w-auto px-10 py-3.5 bg-accent text-bg font-semibold text-sm tracking-wide hover:bg-accent/90 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            <motion.div
+              ref={sendMagnet.ref}
+              style={{ x: sendMagnet.x, y: sendMagnet.y }}
+              onMouseMove={sendMagnet.onMouseMove}
+              onMouseLeave={sendMagnet.onMouseLeave}
+              className="w-full sm:w-auto inline-flex"
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" /> Sending…
-                </>
-              ) : (
-                "Send Message"
-              )}
-            </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto px-10 py-3.5 bg-accent text-bg font-semibold text-sm tracking-wide hover:bg-accent/90 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" /> Sending…
+                  </>
+                ) : (
+                  "Send Message"
+                )}
+              </button>
+            </motion.div>
 
             {status === "success" && (
               <div className="flex items-center gap-2 text-sm text-green-400">
