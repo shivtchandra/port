@@ -261,7 +261,7 @@ export default function BeyondCode() {
     <section id="beyond-code" className="relative z-10 overflow-hidden scroll-mt-20">
       <SectionShell as="div" id="beyond-code-header" className="!pb-12 !pt-12 md:!pt-16">
         <FadeIn>
-          <TrackLabel num="05" name="B-Sides" />
+          <TrackLabel num="06" name="B-Sides" />
           <p className="text-text-muted text-base md:text-lg leading-relaxed mt-6 max-w-2xl">
             Side B — the tracks that don&apos;t ship to npm: playlists, passports, and
             the stuff that keeps the work honest.

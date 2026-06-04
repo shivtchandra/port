@@ -70,7 +70,7 @@ export default function About() {
   return (
     <SectionShell id="about">
       <FadeIn>
-        <TrackLabel num="04" name="Liner Notes" />
+        <TrackLabel num="05" name="Liner Notes" />
         <SectionTitle className="mb-12 md:mb-16 max-w-4xl">
           <ScrambleText text="I build things that ship." />
         </SectionTitle>

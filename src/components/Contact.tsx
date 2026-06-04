@@ -79,7 +79,7 @@ export default function Contact() {
     <SectionShell id="contact">
       <PhotoBooth />
       <FadeIn>
-        <TrackLabel num="06" name="Encore" />
+        <TrackLabel num="07" name="Encore" />
         <SectionTitle large className="mb-6 leading-[0.88]">
           <ScrambleText text="Let's work" />
           <br />

@@ -6,6 +6,7 @@ import SelectedWork from "@/components/SelectedWork";
 import About from "@/components/About";
 import BeyondCode from "@/components/BeyondCode";
 import Experience from "@/components/Experience";
+import Resume from "@/components/Resume";
 import Contact from "@/components/Contact";
 import { SideMarker } from "@/components/ui/SideMarker";
 import { AmbientBackground } from "@/components/AmbientBackground";
@@ -24,6 +25,7 @@ export default function Home() {
       <SideMarker side="a" />
       <SelectedWork />
       <Experience />
+      <Resume />
       <About />
       <SideMarker side="b" />
       <BeyondCode />
