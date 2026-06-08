@@ -442,7 +442,7 @@ export function PhotoBooth() {
                 </div>
                 <div>
                   <p className="text-text text-sm font-medium leading-tight">Golden Hour</p>
-                  <p className="text-text-muted text-[11px] mt-0.5">30 film stocks · Real-time · iOS & Android</p>
+                  <p className="text-text-muted text-[11px] mt-0.5">30 film stocks · Real-time · Android</p>
                 </div>
               </div>
               <div className="flex items-center gap-5">

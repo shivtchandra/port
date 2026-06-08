@@ -145,10 +145,10 @@ export const PROJECTS: Project[] = [
   {
     title: "Golden Hour",
     category: "Film Camera App",
-    platform: "Flutter · iOS & Android",
+    platform: "Flutter · Android",
     description:
       "Film stocks applied through real color-grading pipelines — 30 cameras, real-time capture, freemium + IAP.",
-    outcome: "Shipped · iOS & Android",
+    outcome: "Shipped · Android",
     role: "Solo · Mobile product",
     impact: "Shipped · Play Store",
     stack: ["Flutter", "Dart", "Firebase"],
@@ -161,7 +161,7 @@ export const PROJECTS: Project[] = [
   {
     title: "Savyit",
     category: "Personal Finance Tracker",
-    platform: "Flutter · iOS & Android",
+    platform: "Flutter · Android",
     description:
       "On-device parsing of Indian bank & UPI SMS into budgets and insights — privacy-first, optional sign-in.",
     outcome: "Live · Play Store",
