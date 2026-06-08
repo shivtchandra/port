@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import Hero from "@/components/Hero";
 import SelectedWork from "@/components/SelectedWork";
 import About from "@/components/About";
 import BeyondCode from "@/components/BeyondCode";
 import Experience from "@/components/Experience";
-import Resume from "@/components/Resume";
 import Contact from "@/components/Contact";
+
+const Resume = dynamic(() => import("@/components/Resume"), { ssr: false });
 import { SideMarker } from "@/components/ui/SideMarker";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { SecretBSide } from "@/components/SecretBSide";
