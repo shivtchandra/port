@@ -60,6 +60,21 @@ export const PROJECTS: Project[] = [
     year: "2025",
   },
   {
+    title: "CyberSEAL ERP",
+    category: "Enterprise Resource Platform",
+    description:
+      "End-to-end ERP for a cybersecurity MSP — customers, service delivery, tickets, GRC & risk, assets, finance, approvals, and audit logs in one operations console.",
+    outcome: "Deployed · client ops platform",
+    role: "Full-stack · Client delivery",
+    impact: "Unified MSP operations",
+    stack: ["React", "TypeScript", "Firebase", "Tailwind CSS"],
+    links: {},
+    image: "/projects/cyberseal-erp.png",
+    group: "freelance",
+    featured: true,
+    year: "2026",
+  },
+  {
     title: "HRMS",
     category: "HR Management System",
     description:
@@ -71,6 +86,21 @@ export const PROJECTS: Project[] = [
     image: "/projects/hrms.png",
     group: "freelance",
     year: "2025",
+  },
+  {
+    title: "DriveScope",
+    category: "Car Decision Engine",
+    description:
+      "India's intelligent car decision platform — compare vehicles on every axis, simulate 5-year ownership costs, and explore models in interactive 3D. A decision engine, not a classifieds site.",
+    outcome: "Live demo",
+    role: "Solo · Full-stack",
+    impact: "138 vehicles · 509 specs",
+    stack: ["Next.js", "React", "Three.js", "Framer Motion", "Firebase"],
+    links: { demo: "https://carsim-lovat.vercel.app/" },
+    image: "/projects/drivescope.png",
+    group: "personal",
+    featured: true,
+    year: "2026",
   },
   {
     title: "Resumit",
