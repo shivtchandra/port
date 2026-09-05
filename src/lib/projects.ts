@@ -110,15 +110,104 @@ export const PROJECTS: Project[] = [
   },
   {
     title: "DriveScope",
+    slug: "drivescope",
+    playback: {
+      color: "#c5d4c0",
+      edition: "04 / DECISION",
+      tracks: [
+        {
+          title: "The problem",
+          body: "Buying a car in India means too many tabs and too little context — budget, city roads, family needs, and ownership cost rarely meet in one place.",
+          image: "/projects/drivescope-hero.png",
+        },
+        {
+          title: "What I built",
+          body: "I built DriveScope as a solo Next.js product: natural-language car finding, trim-level compare, five-year cost modeling, guides, and a driving lab — on structured Indian market data.",
+          image: "/projects/drivescope.png",
+        },
+        {
+          title: "Inside the interface",
+          body: "Select a numbered detail to connect the interface to the thinking behind it.",
+          image: "/projects/drivescope-hero.png",
+        },
+      ],
+    },
+    caseStudy: {
+      intro: "A car decision tool for Indian budgets, roads, and ownership — not a classifieds site or a dealer pitch.",
+      ownership: "Solo full-stack product: Next.js, React, Three.js, Framer Motion, Firebase, and structured vehicle data across explore, compare, cost, guides, and simulation.",
+      decisions: [
+        {
+          title: "Start from real life, not a segment",
+          body: "The finder asks for budget, daily drive, passengers, and must-haves, then shortlists trims against Indian prices and usage — so the answer fits a life, not a brochure category.",
+        },
+        {
+          title: "Keep ownership cost attached",
+          body: "EMI, fuel, and five-year running cost stay beside the recommendation. Spec sheets look close until ownership pressure shows up; DriveScope surfaces that earlier.",
+        },
+      ],
+      evidence: "Live at carsim-lovat.vercel.app with 138 cars and 509 trims, plus compare, cost modeling, buyer guides, and a driving lab. Independent of any automaker or dealer.",
+    },
     category: "Car Decision Engine",
     description:
-      "India's intelligent car decision platform — compare vehicles on every axis, simulate 5-year ownership costs, and explore models in interactive 3D. A decision engine, not a classifieds site.",
-    outcome: "Live demo",
+      "India’s car decision platform — ask what fits your life, shortlist trims, compare rivals, and model five-year ownership cost. Built for Indian prices and roads, not dealer agendas.",
+    outcome: "Live · carsim-lovat.vercel.app",
     role: "Solo · Full-stack",
-    impact: "138 vehicles · 509 specs",
-    stack: ["Next.js", "React", "Three.js", "Framer Motion", "Firebase"],
+    impact: "138 cars · 509 trims",
+    stack: ["Next.js", "React", "Three.js", "Framer Motion", "Firebase", "Recharts"],
     links: { demo: "https://carsim-lovat.vercel.app/" },
     image: "/projects/drivescope.png",
+    group: "personal",
+    featured: true,
+    year: "2026",
+  },
+  {
+    title: "Mapping HYD",
+    slug: "mapping-hyd",
+    playback: {
+      color: "#e2c19a",
+      edition: "05 / ATLAS",
+      tracks: [
+        {
+          title: "The problem",
+          body: "Hyderabad has the data, places, and stories — but they stay scattered. Other cities had living digital layers; this one did not.",
+          image: "/projects/mapping-hyd-hero.jpg",
+        },
+        {
+          title: "What I built",
+          body: "I built Mapping HYD as a living atlas: a Next.js hub plus map layers starting with a live startup map — companies, funding, and jobs — with more city layers in progress.",
+          image: "/projects/mapping-hyd.jpg",
+        },
+        {
+          title: "Inside the interface",
+          body: "Select a numbered detail to connect the interface to the thinking behind it.",
+          image: "/projects/mapping-hyd.jpg",
+        },
+      ],
+    },
+    caseStudy: {
+      intro: "A living atlas of Hyderabad — maps that answer where to build, eat, live, and what the city is losing — one layer at a time.",
+      ownership: "Solo product series: Next.js hub at mapmyhyd.com, Leaflet and Firebase map apps, open data seeding, and a shared architecture for each new city layer.",
+      decisions: [
+        {
+          title: "Ship a series, not a single map",
+          body: "The startup map proved the gap. Mapping HYD turns that into an atlas — reusable map kit, seeded data, and a hub that introduces each layer as it ships.",
+        },
+        {
+          title: "Make the city searchable",
+          body: "Each layer is useful on its own: startups with funding and jobs on a live map first; eateries, heritage, and more in the pipeline — open data, real places, maps you can actually use.",
+        },
+      ],
+      evidence: "Hub live at mapmyhyd.com; Hyderabad Startup Map live at startups.mapmyhyd.com. Eateries Race and Deccan Heritage are next in the series.",
+    },
+    category: "City Atlas · Maps",
+    description:
+      "A living atlas of Hyderabad — startups, eateries, heritage, and more — mapped one searchable layer at a time. Hub plus live startup map; more layers shipping.",
+    outcome: "Live · mapmyhyd.com",
+    role: "Solo · Full-stack",
+    impact: "Live atlas · startup layer shipped",
+    stack: ["Next.js", "React", "Leaflet", "Firebase", "MapLibre", "Vercel"],
+    links: { demo: "https://www.mapmyhyd.com/" },
+    image: "/projects/mapping-hyd.jpg",
     group: "personal",
     featured: true,
     year: "2026",

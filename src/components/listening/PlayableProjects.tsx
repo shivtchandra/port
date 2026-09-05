@@ -61,7 +61,7 @@ export function PlayableProjects({ projects }: { projects: Project[] }) {
               }}>
               <span className="jacket-edition">{presentation.edition} <span>SC.</span></span>
               <h3>{project.title === "CyberSealTrain" ? <>CyberSeal<br />Train</> : project.title}</h3>
-              <span className="jacket-category">{project.group === "mobile" ? "A little film. A lot of feeling." : project.group === "personal" ? "Intelligence, with intention." : "Built to bring it together."}</span>
+              <span className="jacket-category">{project.slug === "drivescope" ? "Built for Indian car decisions." : project.slug === "mapping-hyd" ? "Hyderabad, one layer at a time." : project.group === "mobile" ? "A little film. A lot of feeling." : project.group === "personal" ? "Intelligence, with intention." : "Built to bring it together."}</span>
               {notes[slug] ? <p className="jacket-liner">{project.caseStudy?.ownership}</p> : <div className="jacket-art"><Artwork key={presentation.tracks[0].image} src={presentation.tracks[0].image} alt={`${project.title} cover artwork`} /></div>}
               <button className="liner-toggle" onClick={() => setNotes(s => ({ ...s, [slug]: !s[slug] }))} aria-expanded={!!notes[slug]}>{notes[slug] ? "Return to artwork" : "Read the liner notes"} ↻</button>
             </motion.div>
