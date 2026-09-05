@@ -40,12 +40,7 @@
     font-family: var(--font-display);
   }
 
-  /* Custom cursor — hide native on pointer devices */
-  @media (pointer: fine) {
-    *, *::before, *::after {
-      cursor: none !important;
-    }
-  }
+  a, button { cursor: pointer; }
 }
 
 @layer utilities {

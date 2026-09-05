@@ -1,0 +1,25 @@
+.project-lens { padding: 80px clamp(24px,6vw,96px); background: #252c27; color: #eeeade; }
+.project-lens header { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 42px; gap: 16px; }
+.project-lens header > .room-eyebrow { grid-column: 1/-1; color: #b7c1b1; }
+.project-lens h2 { font-size: clamp(27px,3vw,44px); letter-spacing: -.055em; line-height: 1.12; }
+.project-lens h2 em { font-family: Georgia,serif; font-weight: 400; }
+.project-lens header > p:last-child { align-self: end; font-size: 12px; color: #b7c1b1; text-align: right; }
+.lens-layout { display: grid; grid-template-columns: 1.55fr 1fr; gap: 5%; align-items: start; }
+.lens-visual { position: relative; border: 7px solid #e9e5d8; box-shadow: 0 14px 30px #0003; }
+.lens-visual img { display: block; width: 100%; height: auto; }
+.lens-visual button { position: absolute; transform: translate(-50%,-50%); width: 44px; height: 44px; background: #ec8d68; border: 2px solid #fff6e6; color: #222a24; border-radius: 50%; font-size: 13px; font-weight: 700; box-shadow: 0 3px 8px #0005; }
+.lens-visual button[aria-pressed="true"] { background: #242d26; color: #eff2da; outline: 2px solid #e9a07f; outline-offset: 4px; }
+.lens-visual button:active { transform: translate(-50%,-50%) scale(.98); }
+.lens-index { border-top: 1px solid #b7c1b140; }
+.lens-index button { display: flex; width: 100%; gap: 15px; text-align: left; align-items: center; min-height: 54px; border-bottom: 1px solid #b7c1b140; font-size: 10px; color: #b2bca9; }
+.lens-index button span:first-child { font-size: 12px; }
+.lens-index button span:last-child { margin-left: auto; }
+.lens-index button[aria-pressed="true"] { color: #edf4c9; }
+.lens-detail { min-height: 215px; padding-top: 32px; }
+.lens-detail > span { color: #f0a180; font-size: 9px; text-transform: uppercase; letter-spacing: .09em; }
+.lens-detail h3 { margin: 15px 0 12px; font: 400 29px/1.2 Georgia,serif; letter-spacing: -.025em; }
+.lens-detail p { font-size: 13px; line-height: 1.85; color: #c1cabc; }
+.lens-note { max-width: 800px; margin-top: 30px; color: #a7b19e; font-size: 10px; line-height: 1.8; }
+.lens-portrait .lens-visual { max-width: 330px; justify-self: center; }
+.lens-portrait .lens-layout { grid-template-columns: 1fr 1fr; align-items: center; }
+@media(max-width:767px) { .project-lens { padding-top: 55px; padding-bottom: 55px; } .project-lens header { display: block; } .project-lens h2 { margin: 17px 0; } .project-lens header > p:last-child { text-align: left; } .lens-layout, .lens-portrait .lens-layout { grid-template-columns: 1fr; gap: 28px; } .lens-visual button { width: 36px; height: 36px; font-size: 11px; } .lens-detail { min-height: 195px; padding-top: 25px; } }

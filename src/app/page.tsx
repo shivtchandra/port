@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import dynamic from "next/dynamic";
-import Hero from "@/components/Hero";
-import SelectedWork from "@/components/SelectedWork";
+import { PersonalOpening as Hero } from "@/components/listening/PersonalOpening";
+import { WorkGallery as SelectedWork } from "@/components/listening/WorkGallery";
 import About from "@/components/About";
-import BeyondCode from "@/components/BeyondCode";
+import { PersonalChapter } from "@/components/listening/PersonalChapter";
 import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 
-const Resume = dynamic(() => import("@/components/Resume"), { ssr: false });
-import { SideMarker } from "@/components/ui/SideMarker";
-import { AmbientBackground } from "@/components/AmbientBackground";
+
 import { SecretBSide } from "@/components/SecretBSide";
 import { useKonamiCode } from "@/hooks/useKonamiCode";
 
@@ -21,16 +18,12 @@ export default function Home() {
   useKonamiCode(openBSide);
 
   return (
-    <main className="w-full min-h-screen text-text pb-20">
-      <AmbientBackground />
+    <main id="main-content" className="listening-room">
       <Hero />
-      <SideMarker side="a" />
       <SelectedWork />
-      <Experience />
-      <Resume />
+      <div className="career-chapter"><Experience /><a className="room-link resume-link" href="/resume.pdf">Download my resume ↗</a></div>
       <About />
-      <SideMarker side="b" />
-      <BeyondCode />
+      <PersonalChapter />
       <Contact />
       <SecretBSide open={bSideOpen} onClose={() => setBSideOpen(false)} />
     </main>

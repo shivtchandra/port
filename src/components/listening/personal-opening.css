@@ -1,0 +1,82 @@
+.personal-opening { color: #f0eee2; background: #161a17; padding: 25px 5vw 0; overflow: clip; }
+.opening-kicker { display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #b8c2ad; letter-spacing: .08em; }
+.opening-kicker a { display: flex; align-items: center; gap: 9px; min-height: 44px; letter-spacing: 0; }
+.opening-kicker i { width: 6px; height: 6px; border-radius: 50%; background: #d4e79d; }
+.opening-composition { display: grid; grid-template-columns: 1.7fr 1fr; gap: 5%; max-width: 1500px; margin: 30px auto 50px; align-items: center; position: relative; }
+.opening-identity { position: relative; z-index: 1; }
+.opening-identity h1 { font-family: var(--font-display); font-size: clamp(65px,8.7vw,140px); line-height: 1.03; letter-spacing: -.088em; font-weight: 600; position: relative; width: fit-content; }
+.opening-identity h1 > span { color: #dbe7be; }
+.opening-identity h1 b { color: #ec946e; font-weight: inherit; }
+.opening-role { font-size: clamp(15px,1.7vw,24px); margin: 25px 0 21px; letter-spacing: -.035em; }
+.opening-intro { font-size: 17px; line-height: 1.6; color: #c5cebb; }
+.opening-intro em { font-family: Georgia,serif; font-size: 27px; color: #e9eadb; }
+.opening-actions { display: flex; gap: 26px; align-items: center; margin-top: 27px; }
+.opening-location { font-size: 8px; letter-spacing: .08em; color: #aab69e; margin-top: 25px; }
+.opening-objects { position: relative; height: 505px; isolation: isolate; z-index: 5; }
+.sticker-drag { position: absolute; cursor: grab; touch-action: none; user-select: none; -webkit-user-drag: none; }
+.sticker-drag:active { cursor: grabbing; }
+.sticker-headphones { right: -20px; top: -35px; }
+.sticker-ticket { top: 220px; left: -12px; }
+.sticker-photo { right: -5px; bottom: -15px; }
+.headphone-object { display: block; width: 285px; filter: drop-shadow(8px 16px 7px #0005); }
+.headphone-object svg { width: 100%; height: auto; pointer-events: none; -webkit-user-drag: none; }
+.headphone-object > span { position: absolute; left: 8px; top: -15px; bottom: auto; font: italic 14px Georgia,serif; color: #cdd6bf; white-space: nowrap; pointer-events: none; }
+.resume-ticket { display: block; width: 300px; background: #eaa078; color: #2d3024; padding: 20px 52px 18px 20px; box-shadow: 5px 9px 0 #090f0c25,4px 14px 25px #0003; border: 1px solid #f2b58d; }
+.resume-ticket::before,.resume-ticket::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; right: 31px; background: #161a17; }
+.resume-ticket::before { top: -9px; } .resume-ticket::after { bottom: -9px; }
+.ticket-small { font-size: 6px; letter-spacing: .1em; }
+.resume-ticket strong { display: block; font: 600 22px var(--font-display); letter-spacing: -.08em; margin: 15px 0; }
+.ticket-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #5e543a50; padding-top: 12px; font-size: 9px; line-height: 1.5; }
+.ticket-bottom small { font-size: 6px; letter-spacing: .07em; }
+.ticket-bottom b { font-size: 25px; font-weight: 400; }
+.ticket-stub { position: absolute; top: 0; right: 0; bottom: 0; width: 40px; border-left: 1px dashed #60553880; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; font-size: 10px; letter-spacing: .2em; }
+.opening-photo { width: 170px; height: 222px; background: #f0e6d4; color: #3f3c2c; box-shadow: 5px 12px 24px #0005; text-align: left; display: block; cursor: inherit; }
+.opening-photo-face { position: absolute; inset: 9px; display: flex; flex-direction: column; backface-visibility: hidden; pointer-events: none; }
+.opening-photo img { width: 100%; height: 145px; object-fit: cover; object-position: 50% 89%; }
+.opening-photo-face > span { font: italic 12px/1.35 Georgia,serif; padding: 10px 2px 0; }
+.opening-photo-face em { font-size: 10px; }
+.photo-message { padding: 10px 4px; }
+.photo-message strong { font: italic 22px/1.1 Georgia,serif; }
+.photo-message > span { font-size: 13px; line-height: 1.5; margin-top: 10px; }
+.photo-message > em { margin-top: auto; font: italic 10px Georgia,serif; }
+.objects-note { position: absolute; bottom: 8px; left: -20px; font-size: 11px; line-height: 1.5; color: #bcc8ac; }
+.objects-note em { font: italic 16px Georgia,serif; }
+.objects-note b { display: block; font: 28px Georgia,serif; margin: 8px 0 0 35px; }
+.opening-footer { border-top: 1px solid #adba9d35; display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 80px; font-size: 9px; color: #b8c4a8; }
+.opening-footer > span { letter-spacing: .08em; }
+.opening-footer a { min-height: 44px; display: flex; align-items: center; font: italic 16px Georgia,serif; }
+.resume-ticket:focus-visible { outline: 2px solid #2d3024; outline-offset: 3px; }
+@media(max-width:1100px) { .opening-composition { grid-template-columns: 1.5fr 1fr; gap: 3%; } .opening-identity h1 { font-size: 8.2vw; } .sticker-headphones { right: -15px; top: 0; } .headphone-object { width: 230px; } .sticker-ticket { left: 0; top: 230px; } .resume-ticket { width: 235px; } .resume-ticket strong { font-size: 17px; } .sticker-photo { right: 0; bottom: -30px; } .opening-photo { width: 145px; height: 200px; } .opening-photo img { height: 125px; } .objects-note { display: none; } }
+@media(max-width:767px) {
+ .personal-opening { padding: 20px 24px 0; }
+ .opening-kicker { font-size: 7px; }
+ .opening-kicker a { font-size: 0; gap: 0; min-height: 24px; }
+ .opening-composition { grid-template-columns: 1fr; margin: 24px 0 20px; gap: 26px; }
+ .opening-identity h1 { font-size: 13.6vw; line-height: 1.06; }
+ .opening-role { font-size: 17px; margin: 19px 0 14px; }
+ .opening-intro { font-size: 14px; }
+ .opening-intro em { font-size: 24px; }
+ .opening-actions { margin-top: 22px; gap: 22px; }
+ .opening-actions .room-button { font-size: 11px; padding: 12px 15px; gap: 15px; }
+ .opening-actions .room-link { font-size: 11px; }
+ .opening-location { font-size: 6px; margin-top: 20px; }
+ .opening-objects { height: 365px; max-width: 390px; width: 100%; margin: 0 auto; }
+ .sticker-headphones { top: -5px; right: -6px; }
+ .headphone-object { width: 210px; }
+ .headphone-object > span { font-size: 11px; left: 10px; top: 0; bottom: auto; }
+ .sticker-ticket { top: 180px; left: 0; }
+ .resume-ticket { width: 225px; padding: 15px 47px 15px 16px; }
+ .resume-ticket strong { margin: 10px 0; }
+ .sticker-photo { right: -1px; bottom: 0; }
+ .opening-photo { width: 132px; height: 185px; }
+ .opening-photo img { height: 113px; }
+ .opening-photo-face > span { font-size: 10px; }
+ .photo-message { padding: 6px 0; }
+ .photo-message strong { font-size: 20px; }
+ .photo-message > span { font-size: 11px; line-height: 1.35; margin-top: 4px; }
+ .photo-message > em { font-size: 8px; }
+ .opening-footer { min-height: 75px; gap: 10px; }
+ .opening-footer > span { font-size: 6px; max-width: 85px; line-height: 1.5; }
+ .opening-footer a { font-size: 12px; }
+}
+@media(prefers-reduced-motion:reduce) { .sticker-drag { cursor: default; touch-action: auto; } }

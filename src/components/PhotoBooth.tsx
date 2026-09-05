@@ -41,11 +41,17 @@ type CamStatus = "idle" | "requesting" | "active" | "error";
 type Frame = "none" | "polaroid";
 
 export function PhotoBooth() {
-  const [mode, setMode] = useState<"camera" | "upload">("camera");
+  const [mode, setMode] = useState<"camera" | "upload">("upload");
   const [camStatus, setCamStatus] = useState<CamStatus>("idle");
-  const [rawSrc, setRawSrc] = useState<string | null>(null);
+  const [rawSrc, setRawSrc] = useState<string | null>("/photos/travel-01.jpg");
+  const [error, setError] = useState("");
+  const [imageReady, setImageReady] = useState(false);
+  const [printKey, setPrintKey] = useState(0);
+  const mounted = useRef(true);
+  const cameraRequest = useRef(0);
+  const uploadRequest = useRef(0);
   const [activeStock, setActiveStock] = useState<StockId>("golden-hour");
-  const [activeFrame, setActiveFrame] = useState<Frame>("none");
+  const [activeFrame, setActiveFrame] = useState<Frame>("polaroid");
   const [downloading, setDownloading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
 
@@ -60,29 +66,47 @@ export function PhotoBooth() {
   const isPolaroid = activeFrame === "polaroid";
 
   const stopCamera = useCallback(() => {
+    cameraRequest.current += 1;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   }, []);
 
-  useEffect(() => () => stopCamera(), [stopCamera]);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; uploadRequest.current += 1; stopCamera(); }; }, [stopCamera]);
+  useEffect(() => () => { if (rawSrc?.startsWith("blob:")) URL.revokeObjectURL(rawSrc); }, [rawSrc]);
+  useEffect(() => {
+    if (!rawSrc) return;
+    let current = true;
+    const image = new Image();
+    image.onload = () => { if (current) setImageReady(true); };
+    image.onerror = () => { if (current) { setImageReady(false); setError("The preview could not load. Choose another image or use the sample."); } };
+    image.src = rawSrc;
+    return () => { current = false; };
+  }, [rawSrc]);
 
   const startCamera = useCallback(async () => {
+    const request = ++cameraRequest.current;
+    setError("");
     setCamStatus("requesting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 960 } },
       });
+      if (!mounted.current || request !== cameraRequest.current) { stream.getTracks().forEach(track => track.stop()); return; }
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
-      setCamStatus("active");
+      if (mounted.current && request === cameraRequest.current) setCamStatus("active");
     } catch {
+      if (!mounted.current || request !== cameraRequest.current) return;
+      stopCamera();
       setCamStatus("error");
       setMode("upload");
+      setRawSrc("/photos/travel-01.jpg");
+      setError("Camera unavailable. You can keep using the sample, upload a photo, or try Camera again.");
     }
-  }, []);
+  }, [stopCamera]);
 
   function switchToCamera() {
     stopCamera();
@@ -90,14 +114,18 @@ export function PhotoBooth() {
     setRawSrc(null);
     setDownloaded(false);
     setMode("camera");
+    setError("");
+    setImageReady(false);
   }
 
   function switchToUpload() {
     stopCamera();
     setCamStatus("idle");
-    setRawSrc(null);
+    setRawSrc("/photos/travel-01.jpg");
     setDownloaded(false);
     setMode("upload");
+    setError("");
+    fileRef.current?.click();
   }
 
   function snapPhoto() {
@@ -129,9 +157,23 @@ export function PhotoBooth() {
   }
 
   function handleFile(file: File) {
-    if (!file.type.startsWith("image/")) return;
-    setRawSrc(URL.createObjectURL(file));
-    setDownloaded(false);
+    if (!file.type.startsWith("image/") || file.size > 20 * 1024 * 1024) {
+      setError("Choose an image under 20 MB. The sample is still available."); return;
+    }
+    stopCamera();
+    const request = ++uploadRequest.current;
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      if (!mounted.current || request !== uploadRequest.current) { URL.revokeObjectURL(url); return; }
+      setRawSrc(url); setMode("upload"); setCamStatus("idle"); setImageReady(true); setDownloaded(false); setPrintKey(0); setError("");
+    };
+    image.onerror = () => { URL.revokeObjectURL(url); if (mounted.current && request === uploadRequest.current) { setError("This image could not be opened. Try another image or use the sample."); setRawSrc("/photos/travel-01.jpg"); } };
+    image.src = url;
+  }
+
+  function useSample() {
+    stopCamera(); uploadRequest.current += 1; setMode("upload"); setCamStatus("idle"); setRawSrc("/photos/travel-01.jpg"); setDownloaded(false); setPrintKey(0); setError("");
   }
 
   function buildCanvas(img: HTMLImageElement): HTMLCanvasElement {
@@ -179,18 +221,18 @@ export function PhotoBooth() {
   }
 
   async function downloadPhoto() {
-    if (!rawSrc || downloading) return;
+    if (!rawSrc || downloading || !imageReady) return;
+    setError("");
     setDownloading(true);
 
     const img = new Image();
-    img.src = rawSrc;
 
     img.onload = () => {
       try {
         const c = buildCanvas(img);
         c.toBlob(
           (blob) => {
-            if (!blob) { setDownloading(false); return; }
+            if (!blob) { setDownloading(false); setError("The image could not be exported. Please try Download again."); return; }
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
@@ -208,26 +250,28 @@ export function PhotoBooth() {
         );
       } catch {
         setDownloading(false);
+        setError("The image could not be exported. Try again or use the sample.");
       }
     };
 
-    img.onerror = () => setDownloading(false);
+    img.onerror = () => { setDownloading(false); setError("The image could not be loaded for export. Use the sample or upload another image."); };
+    img.src = rawSrc;
   }
 
   return (
     <div className="mb-20 md:mb-28 pb-16 md:pb-24 border-b border-white/10">
       <FadeIn>
         <p className="text-[11px] tracking-[0.3em] uppercase text-text-muted mb-3">
-          if you&apos;ve come this far —
+          Golden Hour / A web preview
         </p>
         <h2
           className="font-display font-extrabold text-text leading-[0.9]"
           style={{ fontSize: "clamp(28px, 4.5vw, 56px)", letterSpacing: "-0.03em" }}
         >
-          This one&apos;s for you.
+          Make a little memory.
         </h2>
         <p className="text-text-muted text-sm md:text-base mt-3 max-w-sm leading-relaxed">
-          Snap a photo or upload one. Pick a film stock. Take it with you.
+          Try a film look on the sample, or bring your own photo. Develop a print. Take it with you. This browser preview uses CSS filters, separate from the Android app’s color-grading pipeline.
         </p>
       </FadeIn>
 
@@ -237,25 +281,22 @@ export function PhotoBooth() {
           {/* ── Left: Frame ──────────────────────────────── */}
           <div>
             {/* Mode toggle — only when no photo */}
-            {!hasPhoto && (
-              <div className="flex items-center mb-4 w-fit border border-white/15">
+            {(
+              <div className="booth-mode-toggle" role="group" aria-label="Photo source">
                 <button
+                  type="button"
                   onClick={switchToCamera}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 text-[10px] tracking-[0.2em] uppercase transition-colors ${
-                    mode === "camera" ? "bg-white/[0.07] text-text" : "text-text-muted hover:text-text"
-                  }`}
+                  aria-pressed={mode === "camera"}
                 >
-                  <Camera size={11} />
+                  <Camera size={12} />
                   Camera
                 </button>
-                <div className="w-px h-4 bg-white/15" />
                 <button
+                  type="button"
                   onClick={switchToUpload}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 text-[10px] tracking-[0.2em] uppercase transition-colors ${
-                    mode === "upload" ? "bg-white/[0.07] text-text" : "text-text-muted hover:text-text"
-                  }`}
+                  aria-pressed={mode === "upload"}
                 >
-                  <Upload size={11} />
+                  <Upload size={12} />
                   Upload
                 </button>
               </div>
@@ -319,6 +360,8 @@ export function PhotoBooth() {
                 <div
                   className="absolute inset-0 flex flex-col items-center justify-center gap-3 cursor-pointer group"
                   onClick={() => fileRef.current?.click()}
+                  role="button" tabIndex={0} aria-label="Choose a photo to upload"
+                  onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); fileRef.current?.click(); } }}
                   onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
                   onDragOver={(e) => e.preventDefault()}
                 >
@@ -332,12 +375,12 @@ export function PhotoBooth() {
 
               {/* Photo preview — fills container (no-frame) or sits inside polaroid padding */}
               {hasPhoto && (
-                <img
-                  src={rawSrc!}
-                  alt="Your portrait"
-                  className={isPolaroid ? "w-full h-auto block" : "absolute inset-0 w-full h-full object-cover"}
-                  style={{ filter: activeFilter }}
-                />
+                <div key={printKey} className={printKey ? "photo-print" : ""} style={isPolaroid ? { position: "relative" } : { position: "absolute", inset: 0 }}>
+                  <img src={rawSrc!} alt={rawSrc?.startsWith("/photos/") ? "Sample travel photograph with selected film look" : "Your photograph with selected film look"}
+                    className={isPolaroid ? "w-full h-auto block" : "absolute inset-0 w-full h-full object-cover"}
+                    style={{ filter: activeFilter }} onLoad={() => setImageReady(true)} onError={() => { setImageReady(false); setError("Preview unavailable. Try another image or return to the sample."); if (rawSrc !== "/photos/hero.jpg") setRawSrc("/photos/hero.jpg"); }} />
+                  {printKey > 0 && <span className="print-overlay" aria-hidden />}
+                </div>
               )}
 
               {/* Shutter button */}
@@ -371,7 +414,8 @@ export function PhotoBooth() {
                 {FILM_STOCKS.map((stock) => (
                   <button
                     key={stock.id}
-                    onClick={() => setActiveStock(stock.id)}
+                    aria-pressed={activeStock === stock.id}
+                    onClick={() => { setActiveStock(stock.id); setDownloaded(false); setPrintKey(0); }}
                     className={`text-left px-4 py-3 border transition-colors ${
                       activeStock === stock.id
                         ? "border-white/50 bg-white/[0.04]"
@@ -394,7 +438,8 @@ export function PhotoBooth() {
                 {(["none", "polaroid"] as Frame[]).map((f) => (
                   <button
                     key={f}
-                    onClick={() => setActiveFrame(f)}
+                    aria-pressed={activeFrame === f}
+                    onClick={() => { setActiveFrame(f); setDownloaded(false); setPrintKey(0); }}
                     className={`px-4 py-2.5 border text-sm transition-colors capitalize ${
                       activeFrame === f
                         ? "border-white/50 bg-white/[0.04] text-text"
@@ -407,17 +452,20 @@ export function PhotoBooth() {
               </div>
             </div>
 
+            {error && <p className="booth-error" role="alert">{error}</p>}
+            <div className="sample-actions"><button onClick={useSample}>Use sample</button><button onClick={() => { if (imageReady) setPrintKey(key => key + 1); }} disabled={!hasPhoto || !imageReady}>Develop print ↗</button></div>
+            <p className="sr-only" role="status">{downloaded ? "Download started." : printKey > 0 ? "Your print is ready." : ""}</p>
             {/* Actions */}
             <div className="flex flex-wrap gap-3 min-h-[44px] items-center">
               {hasPhoto ? (
                 <>
                   <button
                     onClick={downloadPhoto}
-                    disabled={downloading}
+                    disabled={downloading || !imageReady}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-bg font-semibold text-sm tracking-wide hover:bg-accent/90 transition-colors disabled:opacity-60"
                   >
                     {downloaded ? <Check size={14} /> : <Download size={14} />}
-                    {downloading ? "Saving…" : downloaded ? "Saved!" : "Download"}
+                    {downloading ? "Preparing…" : downloaded ? "Download again" : "Download"}
                   </button>
                   <button
                     onClick={retake}

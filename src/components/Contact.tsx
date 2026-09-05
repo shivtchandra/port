@@ -6,12 +6,12 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ArrowUpRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { SectionShell, SectionTitle } from "@/components/ui/SectionShell";
-import { ScrambleText } from "@/components/ui/ScrambleText";
+
 import { motion } from "framer-motion";
 import { useMagnet } from "@/hooks/useMagnet";
 import { TrackLabel } from "@/components/ui/TrackLabel";
 import { WaveformDivider } from "@/components/ui/Waveform";
-import { PhotoBooth } from "@/components/PhotoBooth";
+
 
 const SOCIALS = [
   {
@@ -77,13 +77,12 @@ export default function Contact() {
 
   return (
     <SectionShell id="contact">
-      <PhotoBooth />
       <FadeIn>
         <TrackLabel num="07" name="Encore" />
         <SectionTitle large className="mb-6 leading-[0.88]">
-          <ScrambleText text="Let's work" />
+          Let&apos;s work
           <br />
-          <ScrambleText text="together." />
+          together.
         </SectionTitle>
         <p className="text-text-muted text-base md:text-lg max-w-md mb-16">
           Available for AI and full-stack engineering roles. Open to freelance projects.

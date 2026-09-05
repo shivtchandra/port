@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Unbounded, Inter } from "next/font/google";
 import "./globals.css";
-import CustomCursor from "@/components/CustomCursor";
+import { ListeningNav } from "@/components/listening/ListeningNav";
+import "./listening-room.css";
 import SmoothScroll from "@/components/SmoothScroll";
-import NowPlaying from "@/components/NowPlaying";
-import { VinylDisc } from "@/components/ui/VinylDisc";
+
 
 const unbounded = Unbounded({
   subsets: ["latin"],
@@ -35,14 +35,11 @@ export default function RootLayout({
       <body
         className="font-sans bg-bg text-text antialiased overflow-x-hidden"
       >
-        <CustomCursor />
-        <div className="ambient-bg fixed inset-0 -z-10 pointer-events-none" />
-        <VinylDisc />
-        <div className="fixed inset-0 z-50 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('/noise.png')]"></div>
+        <ListeningNav />
         <SmoothScroll>
           <div className="relative z-10">{children}</div>
         </SmoothScroll>
-        <NowPlaying />
+
       </body>
     </html>
   );

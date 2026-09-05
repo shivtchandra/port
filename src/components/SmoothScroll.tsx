@@ -208,10 +208,16 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       lenis.raf(time);
       raf = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
+    const onVisibility = () => {
+      cancelAnimationFrame(raf);
+      if (!document.hidden) raf = requestAnimationFrame(loop);
+    };
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       stopGuidedTour();
+      document.removeEventListener("visibilitychange", onVisibility);
       cancelAnimationFrame(raf);
       lenis.destroy();
       lenisRef.current = null;

@@ -6,7 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { SectionShell, SectionTitle } from "@/components/ui/SectionShell";
-import { ScrambleText } from "@/components/ui/ScrambleText";
+
 import { TrackLabel } from "@/components/ui/TrackLabel";
 import { EndOfSideA } from "@/components/ui/SideMarker";
 
@@ -26,7 +26,7 @@ const Highlight = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function About() {
-  const [settings, setSettings] = useState<Record<string, any>>({});
+  const [settings, setSettings] = useState<Partial<typeof STATIC_SETTINGS>>({});
   const [loading, setLoading] = useState(true);
   const [photoErrored, setPhotoErrored] = useState(false);
 
@@ -72,7 +72,7 @@ export default function About() {
       <FadeIn>
         <TrackLabel num="05" name="Liner Notes" />
         <SectionTitle className="mb-12 md:mb-16 max-w-4xl">
-          <ScrambleText text="I build things that ship." />
+          I build things that ship.
         </SectionTitle>
       </FadeIn>
 
