@@ -114,10 +114,28 @@ button:active, .room-button:active { transform: scale(.98); }
 .flip-perspective { perspective: 1000px; width: min(100%,330px); aspect-ratio: 1; margin: auto; }
 .flip-record { position: relative; height: 100%; transform-style: preserve-3d; }
 .flip-face { position: absolute; inset: 0; backface-visibility: hidden; display: grid; place-items: center; }
-.flip-face > span { width: 40%; height: 40%; border-radius: 50%; background: #d3e3a4; display: flex; align-items: center; justify-content: center; flex-direction: column; font-size: 10px; line-height: 1; }
-.flip-face b { font: 60px Georgia,serif; }
+.flip-face > span {
+  width: 42%;
+  height: 42%;
+  border-radius: 50%;
+  background: #d3e3a4;
+  display: grid;
+  place-content: center;
+  place-items: center;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: .14em;
+  line-height: 1;
+  color: #2a3224;
+}
+.flip-face b {
+  display: block;
+  margin: 4px 0 0;
+  font: 600 clamp(36px, 8vw, 56px)/.82 Georgia, serif;
+  letter-spacing: -.04em;
+}
 .flip-back { transform: rotateY(180deg); }
-.flip-back > span { background: #cf9b73; }
+.flip-back > span { background: #cf9b73; color: #3a2c22; }
 .personal-content { display: grid; grid-template-columns: 1fr 1fr; gap: 12%; padding: 70px clamp(24px,8vw,120px) 100px; align-items: center; }
 .personal-intro h2 { font-size: clamp(30px,3.3vw,48px); letter-spacing: -.065em; line-height: 1.15; margin: 25px 0; font-weight: 500; }
 .personal-intro > p:not(.room-eyebrow) { color: #756652; line-height: 1.8; font-size: 14px; max-width: 350px; }
@@ -256,12 +274,22 @@ button:active, .room-button:active { transform: scale(.98); }
  .project-disc { right: 0; }
  .project-archive summary { font-size: 17px; }
  .archive-grid { grid-template-columns: 1fr; }
- .side-flip { padding: 65px 24px; grid-template-columns: 1fr; gap: 35px; min-height: auto; background: #ece2d1; }
- .flip-surface { opacity: 1 !important; }
- .flip-perspective { width: 190px; }
- .flip-record { transform: rotateY(180deg) !important; }
- .side-flip-copy h2 { font-size: 35px; }
- .side-flip-copy > p { font-size: 13px; }
+ .side-flip { padding: 65px 24px; grid-template-columns: 1fr; gap: 35px; min-height: min(72vh, 520px); }
+ /* Keep scroll-driven flip + color change on mobile (do not freeze Side B). */
+ .flip-perspective { width: 190px; height: 190px; aspect-ratio: 1; margin: 0 auto; }
+ .flip-face > span { width: 44%; height: 44%; font-size: 8px; }
+ .flip-face b { margin-top: 3px; font-size: 42px; line-height: .8; }
+ .side-flip-copy { background: transparent; color: #d7decc; transition: color 280ms ease; }
+ .side-flip-copy h2 { font-size: 35px; color: #e8efe0; transition: color 280ms ease; }
+ .side-flip-copy h2 em { color: #d4e79d; transition: color 280ms ease; }
+ .side-flip-copy > p { font-size: 13px; color: #b7c1ae; transition: color 280ms ease; }
+ .side-flip-copy > .room-eyebrow { color: #aeb9a2; transition: color 280ms ease; }
+ /* Once the cream surface is mostly in, shift copy to Side B ink */
+ .side-flip[data-side="b"] .side-flip-copy { color: #51422e; }
+ .side-flip[data-side="b"] .side-flip-copy h2 { color: #a45a38; }
+ .side-flip[data-side="b"] .side-flip-copy h2 em { color: #a45a38; }
+ .side-flip[data-side="b"] .side-flip-copy > p { color: #a45a38; }
+ .side-flip[data-side="b"] .side-flip-copy > .room-eyebrow { color: #8a6b52; }
  .personal-content { grid-template-columns: 1fr; padding: 30px 24px 70px; gap: 45px; }
  .personal-intro .personal-note { margin-top: 25px; }
  .personal-intro h2 { font-size: 34px; }
@@ -290,3 +318,550 @@ button:active, .room-button:active { transform: scale(.98); }
  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
+
+/* ── Headphones Audio Player Styles ── */
+.headphones-action-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+  align-items: flex-start;
+}
+
+.headphones-trigger-btn {
+  background: #a45a38 !important;
+  color: #ece2d1 !important;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.headphones-trigger-btn:hover {
+  background: #8e492b !important;
+  transform: translateY(-2px);
+}
+
+.headphones-trigger-btn:active {
+  transform: translateY(0);
+}
+
+.headphones-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headphones-btn-icon {
+  font-size: 16px;
+}
+
+.headphones-player-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 26, 23, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.headphones-player-card {
+  position: relative;
+  background: #ece2d1;
+  color: #312b24;
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(119, 100, 74, 0.2);
+  text-align: center;
+  overflow: hidden;
+}
+
+.player-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #7a6a53;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-close-btn:hover {
+  background: rgba(119, 100, 74, 0.1);
+  color: #312b24;
+}
+
+.player-header {
+  margin-bottom: 24px;
+}
+
+.player-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7a6a53;
+  font-weight: 600;
+}
+
+.player-visual-stage {
+  position: relative;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.player-track-info {
+  margin-bottom: 24px;
+}
+
+.player-track-info h3 {
+  font: 500 24px/1.2 var(--font-display, Georgia, serif);
+  color: #2f2a22;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.player-track-info p {
+  font-size: 13px;
+  color: #7a6752;
+  font-weight: 500;
+}
+
+.player-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.player-time {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #7a6a53;
+  min-width: 32px;
+}
+
+.player-progress-slider {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(119, 100, 74, 0.2);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.player-progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #a45a38;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.player-progress-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.player-controls-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.player-nav-btn {
+  background: transparent;
+  border: none;
+  color: #7a6a53;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.player-nav-btn:hover {
+  background: rgba(119, 100, 74, 0.1);
+  color: #312b24;
+}
+
+.player-play-btn {
+  background: #a45a38;
+  color: #ece2d1;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(164, 90, 56, 0.3);
+}
+
+.player-play-btn:hover {
+  background: #8e492b;
+  transform: scale(1.05);
+}
+
+.player-play-btn:active {
+  transform: scale(0.95);
+}
+
+.player-eq-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 32px;
+}
+
+/* Override global eq-bar animation disable inside the player */
+.headphones-player-card .eq-bar {
+  animation: eq-pulse 0.9s ease-in-out infinite !important;
+}
+
+/* ── Headphones Band & Hi-Fi Player ── */
+.headphones-band {
+  position: relative;
+  background: #181d1a;
+  color: #ece2d1;
+  padding: 100px clamp(24px, 8vw, 120px);
+  border-bottom: 1px solid rgba(119, 100, 74, 0.1);
+  overflow: visible;
+}
+
+.headphones-music-band {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headphones-music-band { display: none; }
+}
+
+.headphones-band-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.headphones-band-intro .room-eyebrow {
+  color: #89957c;
+}
+
+.headphones-band-intro h2 {
+  font-size: clamp(32px, 4vw, 56px);
+  letter-spacing: -.06em;
+  line-height: 1.12;
+  margin: 25px 0;
+  font-weight: 500;
+  color: #e3e9d7;
+}
+
+.headphones-band-intro p {
+  color: #b4bfaf;
+  line-height: 1.8;
+  font-size: 14px;
+  max-width: 460px;
+}
+
+.headphones-band-links {
+  margin-top: 24px;
+}
+
+.headphones-band-intro .personal-note {
+  font: italic 20px Georgia, serif !important;
+  color: #a45a38 !important;
+  margin-top: 45px;
+}
+
+.headphones-band-player {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.hifi-player-deck {
+  background: #121513;
+  border: 2px solid #232a25;
+  border-radius: 12px;
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.hifi-display {
+  background: #0b0d0c;
+  border: 1px solid #1c221e;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: left;
+  font-family: var(--font-mono, monospace);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.hifi-display::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 150, 100, 0.04) 50%, rgba(0, 0, 0, 0.2) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+.hifi-display-kicker {
+  font-size: 9px;
+  color: #6d7f73;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.hifi-display-title {
+  font-size: 14px;
+  color: #a5d6a7;
+  font-weight: bold;
+  text-shadow: 0 0 4px rgba(165, 214, 167, 0.4);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hifi-display-artist {
+  font-size: 11px;
+  color: #81c784;
+  text-shadow: 0 0 4px rgba(129, 199, 132, 0.3);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hifi-display-status {
+  font-size: 9px;
+  color: #e57373;
+  text-shadow: 0 0 4px rgba(229, 115, 115, 0.3);
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.hifi-visual-stage {
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background: #0d0f0e;
+  border-radius: 8px;
+  border: 1px solid #1c221e;
+  overflow: hidden;
+}
+
+.hifi-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.hifi-time {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: #81c784;
+  text-shadow: 0 0 2px rgba(129, 199, 132, 0.3);
+  min-width: 32px;
+}
+
+.hifi-progress-slider {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #1c221e;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.hifi-progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #a45a38;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.hifi-progress-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.hifi-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.hifi-btn {
+  background: #1c221e;
+  border: 1px solid #2d3730;
+  color: #b4bfaf;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hifi-nav-btn {
+  width: 40px;
+  height: 40px;
+}
+
+.hifi-play-btn {
+  width: 56px;
+  height: 56px;
+  background: #a45a38;
+  color: #ece2d1;
+  border-color: #b8653f;
+  box-shadow: 0 4px 12px rgba(164, 90, 56, 0.2);
+}
+
+.hifi-btn:hover {
+  background: #252e28;
+  color: #ece2d1;
+  border-color: #3d4c40;
+}
+
+.hifi-play-btn:hover {
+  background: #b8653f;
+  transform: scale(1.05);
+}
+
+.hifi-play-btn:active {
+  transform: scale(0.95);
+}
+
+.hifi-eq-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+}
+.hifi-play-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid #b8653f;
+  background: #a45a38;
+  color: #ece2d1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(164, 90, 56, 0.28);
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hifi-play-btn:not(.is-listening) svg {
+  margin-left: 2px;
+}
+
+.hifi-play-btn:hover {
+  background: #b8653f;
+  transform: scale(1.06);
+}
+
+.hifi-play-btn:active {
+  transform: scale(0.96);
+}
+
+.hifi-play-btn.is-listening {
+  box-shadow: 0 0 0 3px rgba(165, 214, 167, 0.28), 0 4px 14px rgba(164, 90, 56, 0.35);
+}
+
+
+/* Ensure equalizer bars animate inside the hi-fi deck */
+.hifi-player-deck .eq-bar {
+  animation: eq-pulse 0.9s ease-in-out infinite !important;
+}
+
+/* Centered photo crate band */
+.photo-collection-full {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Responsive Overrides for Headphones Band */
+@media (max-width: 900px) {
+  .headphones-band-container {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+  
+  .headphones-band-intro {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .headphones-band-intro p {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .headphones-band {
+    padding: 60px 24px;
+  }
+  
+  .headphones-band-intro h2 {
+    font-size: 34px;
+  }
+  
+  .hifi-player-deck {
+    padding: 20px;
+  }
+}

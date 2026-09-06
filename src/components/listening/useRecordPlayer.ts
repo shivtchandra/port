@@ -91,10 +91,11 @@ export function useRecordPlayer(slugs: string[]) {
 
   const play = useCallback((slug: string, align = true) => {
     suppressed.current = null; activeRef.current = slug; setActive(slug);
+    // Hold scroll-spy while the disc lands and 01→02→03 opens into view.
+    manualUntil.current = performance.now() + 5000;
     if (align) {
       const el = chapters.current.get(slug);
       const offset = window.innerWidth < 1024 ? 220 : 112;
-      manualUntil.current = performance.now() + 200;
       if (el) {
         const top = el.getBoundingClientRect().top + window.scrollY - offset;
         if (lenisRef.current) lenisRef.current.scrollTo(top, { immediate: true });
