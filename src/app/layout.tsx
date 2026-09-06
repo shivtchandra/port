@@ -4,6 +4,7 @@ import "./globals.css";
 import { ListeningNav } from "@/components/listening/ListeningNav";
 import "./listening-room.css";
 import SmoothScroll from "@/components/SmoothScroll";
+import { Analytics } from "@vercel/analytics/next";
 
 
 const unbounded = Unbounded({
@@ -39,7 +40,7 @@ export default function RootLayout({
         <SmoothScroll>
           <div className="relative z-10">{children}</div>
         </SmoothScroll>
-
+        <Analytics />
       </body>
     </html>
   );

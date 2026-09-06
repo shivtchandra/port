@@ -6,6 +6,10 @@ body { background: #161a17; }
 .room-wordmark { font-size: 40px; letter-spacing: -4px; font-weight: 600; line-height: 1; }
 .wordmark-dot { color: var(--room-lime); }
 .nav-caption { font-size: 11px; color: #b3b8ae; letter-spacing: .03em; }
+.nav-views { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: #b3b8ae; letter-spacing: .03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nav-views-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--room-lime); box-shadow: 0 0 0 0 #d4e79d88; animation: nav-views-pulse 2.4s ease-out infinite; }
+@keyframes nav-views-pulse { 0% { box-shadow: 0 0 0 0 #d4e79d66; } 70% { box-shadow: 0 0 0 8px #d4e79d00; } 100% { box-shadow: 0 0 0 0 #d4e79d00; } }
+@media (prefers-reduced-motion: reduce) { .nav-views-dot { animation: none; } }
 .room-nav nav { margin-left: auto; display: flex; align-items: center; gap: 28px; font-size: 13px; }
 .room-nav nav a { min-height: 44px; display: inline-flex; align-items: center; gap: 14px; }
 .room-nav nav a:hover { color: var(--room-lime); }
@@ -227,6 +231,7 @@ button:active, .room-button:active { transform: scale(.98); }
 @media (min-width: 1600px) { .room-hero { padding-left: 80px; padding-right: 80px; } }
 @media (max-width: 1050px) {
  .nav-caption { display: none; }
+ .nav-views { font-size: 10px; }
  .room-hero { gap: 25px; padding-top: 50px; }
  .hero-copy h1 { font-size: clamp(30px,4vw,43px); }
  .hero-art { min-height: 485px; }
