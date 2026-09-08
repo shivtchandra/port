@@ -87,11 +87,7 @@ interface SparkleParticle {
   isStar: boolean;
 }
 
-interface RibbonNode {
-  x: number;
-  y: number;
-  age: number;
-}
+
 
 function PlayerHeadphonesSVG({ isPlaying, style }: { isPlaying: boolean; style?: MotionStyle }) {
   return (
@@ -146,7 +142,6 @@ export function PersonalChapter() {
   // Magical particle & ribbon pools
   const notesRef = useRef<NoteParticle[]>([]);
   const sparklesRef = useRef<SparkleParticle[]>([]);
-  const ribbonNodesRef = useRef<RibbonNode[]>([]);
   const pointerRef = useRef<{ x: number; y: number; inside: boolean }>({ x: 0, y: 0, inside: false });
   const lastSpawnPosRef = useRef<{ x: number; y: number }>({ x: -999, y: -999 });
   const idleTimerRef = useRef(0);
@@ -283,39 +278,6 @@ export function PersonalChapter() {
         }
       }
 
-      // Update & Draw Gossamer Ribbon Wake
-      const ribbon = ribbonNodesRef.current;
-      for (let i = ribbon.length - 1; i >= 0; i--) {
-        ribbon[i].age += 1;
-        if (ribbon[i].age > 28) {
-          ribbon.splice(i, 1);
-        }
-      }
-
-      if (ribbon.length > 2) {
-        ctx.save();
-        ctx.lineJoin = "round";
-        ctx.lineCap = "round";
-
-        for (let i = 0; i < ribbon.length - 1; i++) {
-          const p1 = ribbon[i];
-          const p2 = ribbon[i + 1];
-          const progress = 1 - (p1.age / 28);
-          const alpha = Math.max(0, progress * 0.42);
-          const strokeWidth = Math.max(0.5, progress * 5.5);
-
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(212, 231, 157, ${alpha})`;
-          ctx.lineWidth = strokeWidth;
-          ctx.shadowColor = "rgba(212, 231, 157, 0.7)";
-          ctx.shadowBlur = 10;
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
-
       // Update & Draw Floating Notes
       const notes = notesRef.current;
       for (let i = notes.length - 1; i >= 0; i--) {
@@ -407,11 +369,7 @@ export function PersonalChapter() {
     pointerRef.current = { x, y, inside: true };
     idleTimerRef.current = 0;
 
-    // Add point to silk ribbon wake
-    ribbonNodesRef.current.push({ x, y, age: 0 });
-    if (ribbonNodesRef.current.length > 25) {
-      ribbonNodesRef.current.shift();
-    }
+
 
     // Distance check for particle emission
     const last = lastSpawnPosRef.current;
