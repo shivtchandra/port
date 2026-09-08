@@ -14,6 +14,7 @@ import {
 import { PhotoBooth } from "@/components/PhotoBooth";
 import { ROOM_EASE, ROOM_SPRING } from "@/lib/room-motion";
 import { Equalizer } from "@/components/ui/Equalizer";
+import { AnalogVuMeter } from "./AnalogVuMeter";
 
 const photos = [
   { src: "/photos/travel-01.jpg", caption: "A little further from the usual.", stamp: "FIELD RECORDING", paper: "#faf8f0" },
@@ -534,6 +535,9 @@ export function PersonalChapter() {
                   )}
                 </button>
               </div>
+
+              {/* Backlit Analog Dual-VU Meter */}
+              <AnalogVuMeter isPlaying={listening} className="hifi-vu-meter" />
 
               <div className="hifi-eq-container">
                 <Equalizer

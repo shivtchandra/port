@@ -82,7 +82,28 @@ export function PlayableProjects({ projects }: { projects: Project[] }) {
               onKeyDown={e => { if (["ArrowLeft", "ArrowRight", "Enter", " "].includes(e.key)) { e.preventDefault(); player.scratch(); } }}><Vinyl project={disc} /></div>}
             <i className="deck-spindle" aria-hidden />
           </div>
-          <div className={`tonearm ${player.phase === "playing" || player.phase === "lowering" ? "arm-down" : ""}`} aria-hidden><span className="arm-pivot" /><span className="arm-shaft" /><span className="arm-head" /></div>
+          {(() => {
+            const isDown = player.phase === "playing" || player.phase === "lowering";
+            const currentTrackIndex = disc ? (tracks[disc.slug!] ?? 0) : 0;
+            // Tonearm Radial Groove Traversal: Outer groove (22.2deg) -> Mid body (25.4deg) -> Inner runout (28.6deg)
+            const armAngle = isDown ? 22.2 + currentTrackIndex * 3.2 : -9;
+            return (
+              <div
+                className={`tonearm ${isDown ? "arm-down" : ""}`}
+                style={{
+                  transform: `rotate(${armAngle}deg)`,
+                  transition: isDown
+                    ? "transform 750ms cubic-bezier(0.34, 1.25, 0.64, 1)"
+                    : "transform 220ms ease-out",
+                }}
+                aria-hidden
+              >
+                <span className="arm-pivot" />
+                <span className="arm-shaft" />
+                <span className="arm-head" />
+              </div>
+            );
+          })()}
           <div className="speed-selector" aria-hidden><span>33</span><i /><span>45</span></div>
         </div>
         <div className="deck-display" role="status" aria-live="polite"><span className={player.loaded ? "deck-led active" : "deck-led"} /><div><small>{player.phase === "playing" ? player.paused ? "ROTATION PAUSED" : "NOW PLAYING" : player.phase === "idle" ? "READY WHEN YOU ARE" : "CHANGING THE RECORD"}</small><strong>{disc?.title ?? (player.phase === "idle" ? "Pick a project" : "One moment…")}</strong></div><span className="deck-counter">{disc ? `0${(tracks[disc.slug!] ?? 0) + 1}` : "—"}</span></div>
