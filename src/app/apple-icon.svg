@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <rect width="180" height="180" rx="42" fill="#141815"/>
+  <rect x="2" y="2" width="176" height="176" rx="40" fill="none" stroke="#2c362e" stroke-width="4"/>
+  <!-- Subtle vinyl grooves -->
+  <circle cx="90" cy="90" r="74" fill="none" stroke="#1e261f" stroke-width="3"/>
+  <circle cx="90" cy="90" r="60" fill="none" stroke="#182019" stroke-width="2"/>
+  <circle cx="90" cy="90" r="46" fill="#1b231c" stroke="#2d382e" stroke-width="2"/>
+  <!-- sc. wordmark -->
+  <text x="80" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="76" font-weight="800" fill="#f4f0e7" letter-spacing="-7" text-anchor="middle">sc</text>
+  <!-- Signature lime accent dot -->
+  <circle cx="132" cy="108" r="11" fill="#d4e79d"/>
+</svg>

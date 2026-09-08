@@ -48,15 +48,50 @@ const NOW_PLAYING = {
   spotifyProfile: "https://open.spotify.com/user/5mwiefw3jc4vxqft713g2y0jl",
 };
 
-type TrailPoint = { x: number; y: number };
 
-const TRAIL_MAX = 56;
-const STAFF_OFFSETS = [-10, -5, 0, 5, 10];
-const TRAIL = {
-  glow: "137, 149, 124",
-  line: "196, 203, 182",
-  note: "211, 227, 164",
-};
+const MUSIC_GLYPHS = ["♪", "♫", "♩", "♬", "𝄞", "𝄢", "✦", "★"];
+const GLOW_PALETTE = [
+  "212, 231, 157", // Album Lime
+  "246, 232, 184", // Warm Champagne
+  "234, 160, 120", // Terracotta Rose
+  "165, 214, 167", // Emerald Mint
+  "255, 255, 255", // Star Glint
+];
+
+interface NoteParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  char: string;
+  color: string;
+  size: number;
+  rot: number;
+  vRot: number;
+  life: number;
+  maxLife: number;
+  phase: number;
+  wobbleSpeed: number;
+  wobbleAmp: number;
+}
+
+interface SparkleParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  color: string;
+  life: number;
+  maxLife: number;
+  isStar: boolean;
+}
+
+interface RibbonNode {
+  x: number;
+  y: number;
+  age: number;
+}
 
 function PlayerHeadphonesSVG({ isPlaying, style }: { isPlaying: boolean; style?: MotionStyle }) {
   return (
@@ -101,111 +136,6 @@ function PlayerHeadphonesSVG({ isPlaying, style }: { isPlaying: boolean; style?:
   );
 }
 
-function chaikin(points: TrailPoint[], iterations = 2): TrailPoint[] {
-  let pts = points;
-  for (let n = 0; n < iterations; n++) {
-    if (pts.length < 3) break;
-    const next: TrailPoint[] = [pts[0]];
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p = pts[i];
-      const q = pts[i + 1];
-      next.push(
-        { x: p.x * 0.75 + q.x * 0.25, y: p.y * 0.75 + q.y * 0.25 },
-        { x: p.x * 0.25 + q.x * 0.75, y: p.y * 0.25 + q.y * 0.75 },
-      );
-    }
-    next.push(pts[pts.length - 1]);
-    pts = next;
-  }
-  return pts;
-}
-
-function buildSmoothStroke(points: TrailPoint[]): Path2D {
-  const path = new Path2D();
-  const pts = chaikin(points, 2);
-  if (!pts.length) return path;
-  path.moveTo(pts[0].x, pts[0].y);
-  if (pts.length === 1) return path;
-  if (pts.length === 2) {
-    path.lineTo(pts[1].x, pts[1].y);
-    return path;
-  }
-
-  // Catmull-Rom → cubic Bezier for a continuous ribbon
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[Math.max(0, i - 1)];
-    const p1 = pts[i];
-    const p2 = pts[i + 1];
-    const p3 = pts[Math.min(pts.length - 1, i + 2)];
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
-  }
-  return path;
-}
-
-function offsetRibbon(points: TrailPoint[], offset: number): TrailPoint[] {
-  if (points.length < 2) return points;
-  const out: TrailPoint[] = [];
-  let px = 0;
-  let py = -1;
-  for (let i = 0; i < points.length; i++) {
-    const a = points[Math.max(0, i - 1)];
-    const b = points[Math.min(points.length - 1, i + 1)];
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const len = Math.hypot(dx, dy);
-    if (len > 0.001) {
-      const nx = -dy / len;
-      const ny = dx / len;
-      px = px * 0.82 + nx * 0.18;
-      py = py * 0.82 + ny * 0.18;
-      const nlen = Math.hypot(px, py) || 1;
-      px /= nlen;
-      py /= nlen;
-    }
-    out.push({ x: points[i].x + px * offset, y: points[i].y + py * offset });
-  }
-  return out;
-}
-
-function relaxTrail(points: TrailPoint[], amount = 0.22) {
-  if (points.length < 3) return;
-  // keep endpoints; average interiors toward neighbors
-  const copy = points.map((p) => ({ ...p }));
-  for (let i = 1; i < points.length - 1; i++) {
-    const prev = copy[i - 1];
-    const next = copy[i + 1];
-    points[i].x += ((prev.x + next.x) * 0.5 - points[i].x) * amount;
-    points[i].y += ((prev.y + next.y) * 0.5 - points[i].y) * amount;
-  }
-}
-
-function drawNote(ctx: CanvasRenderingContext2D, x: number, y: number, ang: number, alpha: number) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(ang);
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = `rgb(${TRAIL.note})`;
-  ctx.strokeStyle = `rgb(${TRAIL.note})`;
-  ctx.lineWidth = 1.25;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 3.2, 2.3, 0.35, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(2.1, -0.7);
-  ctx.lineTo(2.1, -12);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(2.1, -12);
-  ctx.quadraticCurveTo(8, -9.5, 7, -4.5);
-  ctx.stroke();
-  ctx.restore();
-}
-
 export function PersonalChapter() {
   const ref = useRef<HTMLElement>(null);
   const bandRef = useRef<HTMLDivElement>(null);
@@ -213,11 +143,13 @@ export function PersonalChapter() {
   const stageRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
 
-  const trailRef = useRef<TrailPoint[]>([]);
+  // Magical particle & ribbon pools
+  const notesRef = useRef<NoteParticle[]>([]);
+  const sparklesRef = useRef<SparkleParticle[]>([]);
+  const ribbonNodesRef = useRef<RibbonNode[]>([]);
   const pointerRef = useRef<{ x: number; y: number; inside: boolean }>({ x: 0, y: 0, inside: false });
-  const headRef = useRef<{ x: number; y: number; vx: number; vy: number } | null>(null);
-  const lastSampleRef = useRef(0);
-  const fadeRef = useRef(0);
+  const lastSpawnPosRef = useRef<{ x: number; y: number }>({ x: -999, y: -999 });
+  const idleTimerRef = useRef(0);
   const rafRef = useRef(0);
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 90%", "start 25%"] });
@@ -253,6 +185,7 @@ export function PersonalChapter() {
     cue(d);
   };
 
+  // Canvas resize observer
   useEffect(() => {
     const band = bandRef.current;
     const canvas = canvasRef.current;
@@ -275,6 +208,54 @@ export function PersonalChapter() {
     return () => ro.disconnect();
   }, []);
 
+  // Helper to spawn notes
+  const spawnNote = (x: number, y: number, customVx?: number, customVy?: number) => {
+    const char = MUSIC_GLYPHS[Math.floor(Math.random() * MUSIC_GLYPHS.length)];
+    const color = GLOW_PALETTE[Math.floor(Math.random() * GLOW_PALETTE.length)];
+    const size = 15 + Math.random() * 12;
+    const maxLife = 55 + Math.random() * 30;
+
+    notesRef.current.push({
+      x: x + (Math.random() - 0.5) * 12,
+      y: y + (Math.random() - 0.5) * 12,
+      vx: customVx ?? (Math.random() - 0.5) * 1.4,
+      vy: customVy ?? -0.8 - Math.random() * 1.4,
+      char,
+      color,
+      size,
+      rot: (Math.random() - 0.5) * 0.5,
+      vRot: (Math.random() - 0.5) * 0.04,
+      life: maxLife,
+      maxLife,
+      phase: Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.04 + Math.random() * 0.05,
+      wobbleAmp: 0.7 + Math.random() * 0.8,
+    });
+  };
+
+  // Helper to spawn sparkles
+  const spawnSparkles = (x: number, y: number, count = 2) => {
+    for (let i = 0; i < count; i++) {
+      const color = GLOW_PALETTE[Math.floor(Math.random() * GLOW_PALETTE.length)];
+      const maxLife = 25 + Math.random() * 25;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 0.5 + Math.random() * 2.2;
+
+      sparklesRef.current.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 0.4,
+        size: 2 + Math.random() * 3.5,
+        color,
+        life: maxLife,
+        maxLife,
+        isStar: Math.random() > 0.4,
+      });
+    }
+  };
+
+  // Main animation render loop
   useEffect(() => {
     if (reduced) return;
     let alive = true;
@@ -292,92 +273,115 @@ export function PersonalChapter() {
       ctx.clearRect(0, 0, width, height);
 
       const pointer = pointerRef.current;
-      if (pointer.inside) {
-        fadeRef.current += (1 - fadeRef.current) * 0.14;
-        if (!headRef.current) {
-          headRef.current = { x: pointer.x, y: pointer.y, vx: 0, vy: 0 };
-        } else {
-          const head = headRef.current;
-          const stiffness = 0.16;
-          const damping = 0.78;
-          head.vx = (head.vx + (pointer.x - head.x) * stiffness) * damping;
-          head.vy = (head.vy + (pointer.y - head.y) * stiffness) * damping;
-          head.x += head.vx;
-          head.y += head.vy;
-        }
 
-        const head = headRef.current!;
-        const trail = trailRef.current;
-        const last = trail[trail.length - 1];
-        const moved = last ? Math.hypot(head.x - last.x, head.y - last.y) : 99;
-        if (moved > 2.4 || now - lastSampleRef.current > 20) {
-          trail.push({ x: head.x, y: head.y });
-          if (trail.length > TRAIL_MAX) trail.shift();
-          lastSampleRef.current = now;
-        }
-        relaxTrail(trail, 0.18);
-      } else if (trailRef.current.length || fadeRef.current > 0.01) {
-        // Smooth close-out: fade + collapse the ribbon toward its tip
-        fadeRef.current += (0 - fadeRef.current) * 0.07;
-        const trail = trailRef.current;
-        relaxTrail(trail, 0.32);
-        for (let i = 0; i < trail.length - 1; i++) {
-          trail[i].x += (trail[i + 1].x - trail[i].x) * 0.14;
-          trail[i].y += (trail[i + 1].y - trail[i].y) * 0.14;
-        }
-        // drop near-duplicates created by the collapse
-        for (let i = trail.length - 2; i >= 0; i--) {
-          if (Math.hypot(trail[i].x - trail[i + 1].x, trail[i].y - trail[i + 1].y) < 1.2) {
-            trail.splice(i, 1);
-          }
-        }
-        if (fadeRef.current < 0.03 || trail.length < 2) {
-          trailRef.current = [];
-          fadeRef.current = 0;
-          headRef.current = null;
+      // Handle hover note breathing
+      if (pointer.inside) {
+        idleTimerRef.current += 1;
+        if (idleTimerRef.current % 18 === 0 && notesRef.current.length < 24) {
+          spawnNote(pointer.x, pointer.y);
+          spawnSparkles(pointer.x, pointer.y, 1);
         }
       }
 
-      const points = trailRef.current;
-      const fade = fadeRef.current;
-      if (points.length >= 2 && fade > 0.01) {
+      // Update & Draw Gossamer Ribbon Wake
+      const ribbon = ribbonNodesRef.current;
+      for (let i = ribbon.length - 1; i >= 0; i--) {
+        ribbon[i].age += 1;
+        if (ribbon[i].age > 28) {
+          ribbon.splice(i, 1);
+        }
+      }
+
+      if (ribbon.length > 2) {
         ctx.save();
-        ctx.globalAlpha = fade;
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
 
-        ctx.shadowColor = `rgba(${TRAIL.glow}, 0.22)`;
-        ctx.shadowBlur = 16;
-        ctx.strokeStyle = `rgba(${TRAIL.glow}, 0.16)`;
-        ctx.lineWidth = 26;
-        ctx.stroke(buildSmoothStroke(points));
-        ctx.shadowBlur = 0;
+        for (let i = 0; i < ribbon.length - 1; i++) {
+          const p1 = ribbon[i];
+          const p2 = ribbon[i + 1];
+          const progress = 1 - (p1.age / 28);
+          const alpha = Math.max(0, progress * 0.42);
+          const strokeWidth = Math.max(0.5, progress * 5.5);
 
-        for (const offset of STAFF_OFFSETS) {
-          ctx.strokeStyle = `rgba(${TRAIL.line}, 0.36)`;
-          ctx.lineWidth = 1.05;
-          ctx.stroke(buildSmoothStroke(offsetRibbon(points, offset)));
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = `rgba(212, 231, 157, ${alpha})`;
+          ctx.lineWidth = strokeWidth;
+          ctx.shadowColor = "rgba(212, 231, 157, 0.7)";
+          ctx.shadowBlur = 10;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Update & Draw Floating Notes
+      const notes = notesRef.current;
+      for (let i = notes.length - 1; i >= 0; i--) {
+        const p = notes[i];
+        p.life -= 1;
+        if (p.life <= 0) {
+          notes.splice(i, 1);
+          continue;
         }
 
-        let travelled = 0;
-        let nextAt = 40;
-        for (let i = 1; i < points.length - 1; i++) {
-          const a = points[i - 1];
-          const b = points[i];
-          const seg = Math.hypot(b.x - a.x, b.y - a.y) || 0.0001;
-          const ang = Math.atan2(b.y - a.y, b.x - a.x);
-          travelled += seg;
-          while (travelled >= nextAt) {
-            const over = travelled - nextAt;
-            const u = 1 - over / seg;
-            const x = a.x + (b.x - a.x) * u;
-            const y = a.y + (b.y - a.y) * u;
-            const line = ((nextAt / 40) | 0) % 5;
-            const ribbon = offsetRibbon([a, { x, y }, b], STAFF_OFFSETS[line]);
-            const age = i / (points.length - 1);
-            drawNote(ctx, ribbon[1].x, ribbon[1].y, ang - Math.PI / 2, 0.18 + age * 0.5);
-            nextAt += 34 + (((nextAt / 40) | 0) % 2) * 6;
-          }
+        const norm = p.life / p.maxLife; // 1 -> 0
+        const alpha = Math.sin(norm * Math.PI) * 0.95;
+        const scale = 0.45 + Math.sin(norm * Math.PI) * 0.65;
+
+        p.phase += p.wobbleSpeed;
+        p.x += p.vx + Math.sin(p.phase) * p.wobbleAmp;
+        p.y += p.vy;
+        p.rot += p.vRot;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.font = `bold ${Math.round(p.size * scale)}px Georgia, serif, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowColor = `rgba(${p.color}, 0.9)`;
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = `rgba(${p.color}, ${alpha})`;
+        ctx.fillText(p.char, 0, 0);
+        ctx.restore();
+      }
+
+      // Update & Draw Stardust Sparkles
+      const sparkles = sparklesRef.current;
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const s = sparkles[i];
+        s.life -= 1;
+        if (s.life <= 0) {
+          sparkles.splice(i, 1);
+          continue;
+        }
+
+        const norm = s.life / s.maxLife;
+        const alpha = Math.sin(norm * Math.PI) * 0.9;
+        s.x += s.vx;
+        s.y += s.vy;
+
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.shadowColor = `rgba(${s.color}, 0.85)`;
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = `rgba(${s.color}, ${alpha})`;
+
+        if (s.isStar) {
+          const r = s.size * (0.5 + norm * 0.5);
+          ctx.beginPath();
+          ctx.moveTo(0, -r);
+          ctx.quadraticCurveTo(0, 0, r, 0);
+          ctx.quadraticCurveTo(0, 0, 0, r);
+          ctx.quadraticCurveTo(0, 0, -r, 0);
+          ctx.quadraticCurveTo(0, 0, 0, -r);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, s.size * 0.6 * (0.5 + norm * 0.5), 0, Math.PI * 2);
+          ctx.fill();
         }
         ctx.restore();
       }
@@ -392,19 +396,53 @@ export function PersonalChapter() {
     };
   }, [reduced]);
 
+  // Pointer move handler with smooth note emission
   const handleBandPointerMove = (e: React.PointerEvent) => {
     const band = bandRef.current;
     if (!band || reduced) return;
     const rect = band.getBoundingClientRect();
-    pointerRef.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-      inside: true,
-    };
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    pointerRef.current = { x, y, inside: true };
+    idleTimerRef.current = 0;
+
+    // Add point to silk ribbon wake
+    ribbonNodesRef.current.push({ x, y, age: 0 });
+    if (ribbonNodesRef.current.length > 25) {
+      ribbonNodesRef.current.shift();
+    }
+
+    // Distance check for particle emission
+    const last = lastSpawnPosRef.current;
+    const dist = Math.hypot(x - last.x, y - last.y);
+    if (dist > 16) {
+      spawnNote(x, y);
+      spawnSparkles(x, y, 2);
+      lastSpawnPosRef.current = { x, y };
+    }
+  };
+
+  // Pointer click handler for magical chord burst
+  const handleBandPointerDown = (e: React.PointerEvent) => {
+    const band = bandRef.current;
+    if (!band || reduced) return;
+    const rect = band.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Burst 8 musical notes and 16 sparkles in all directions
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+      const speed = 1.4 + Math.random() * 2.2;
+      spawnNote(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed - 0.8);
+    }
+    spawnSparkles(x, y, 16);
   };
 
   const handleBandPointerLeave = () => {
     pointerRef.current = { ...pointerRef.current, inside: false };
+    lastSpawnPosRef.current = { x: -999, y: -999 };
   };
 
   const handleStageMouseMove = (e: React.MouseEvent) => {
@@ -475,6 +513,7 @@ export function PersonalChapter() {
         ref={bandRef}
         className="headphones-band"
         onPointerMove={handleBandPointerMove}
+        onPointerDown={handleBandPointerDown}
         onPointerLeave={handleBandPointerLeave}
       >
         <canvas ref={canvasRef} className="headphones-music-band" aria-hidden />

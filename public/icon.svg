@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="8" fill="#141815"/>
+  <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" fill="none" stroke="#2c362e" stroke-width="1"/>
+  <!-- Vinyl concentric groove subtle ring -->
+  <circle cx="16" cy="16" r="13" fill="none" stroke="#1d241e" stroke-width="1"/>
+  <!-- sc. wordmark -->
+  <text x="14" y="21.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="800" fill="#f4f0e7" letter-spacing="-1.5" text-anchor="middle">sc</text>
+  <!-- Signature lime accent dot -->
+  <circle cx="23.5" cy="19.5" r="2.2" fill="#d4e79d"/>
+</svg>

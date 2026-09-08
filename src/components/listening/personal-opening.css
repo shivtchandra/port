@@ -4,6 +4,7 @@
   padding: 25px 5vw 0;
   overflow: clip;
 }
+
 .opening-kicker {
   display: flex;
   justify-content: space-between;
@@ -32,18 +33,18 @@
   position: relative;
   isolation: isolate;
   max-width: 1400px;
-  min-height: min(72vh, 640px);
-  margin: 12px auto 20px;
+  min-height: min(72vh, 660px);
+  margin: 16px auto 20px;
   display: grid;
   place-items: center;
-  padding: clamp(40px, 7vw, 80px) clamp(16px, 4vw, 40px) clamp(56px, 8vw, 90px);
+  padding: clamp(36px, 6vw, 70px) clamp(16px, 4vw, 40px) clamp(48px, 6vw, 80px);
   overflow: visible;
 }
 
 .opening-center {
   position: relative;
   z-index: 2;
-  width: min(720px, 100%);
+  width: min(680px, 100%);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -55,15 +56,15 @@
 }
 
 .opening-hello {
-  margin: 0 0 18px;
-  font: italic clamp(18px, 2vw, 24px)/1.2 Georgia, serif;
+  margin: 0 0 16px;
+  font: italic clamp(16px, 1.8vw, 22px)/1.2 Georgia, serif;
   color: #c8d1bb;
 }
 .name-pill {
   display: inline-flex;
   align-items: baseline;
   gap: .28em;
-  padding: 8px 16px 9px;
+  padding: 7px 16px 8px;
   border: 1px solid #8a967a55;
   border-radius: 999px;
   background: #1c221ecc;
@@ -75,15 +76,16 @@
   font-weight: 600;
   color: #dbe7be;
 }
+
 .opening-statement {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(28px, 4.4vw, 54px);
-  line-height: 1.12;
-  letter-spacing: -.055em;
+  font-size: clamp(28px, 4.2vw, 52px);
+  line-height: 1.14;
+  letter-spacing: -.05em;
   color: #f0eee2;
-  max-width: 16ch;
+  max-width: 17ch;
 }
 .opening-statement em {
   display: block;
@@ -92,20 +94,22 @@
   font-weight: 400;
   letter-spacing: -.03em;
   color: #dbe7be;
-  margin-top: .12em;
+  margin-top: .1em;
 }
 .opening-statement span {
   display: block;
   color: #ec946e;
   margin-top: .08em;
 }
+
 .opening-support {
-  margin: 22px 0 0;
-  max-width: 42ch;
+  margin: 20px 0 0;
+  max-width: 44ch;
   font-size: 15px;
   line-height: 1.65;
   color: #aeb9a2;
 }
+
 .opening-actions {
   display: flex;
   gap: 22px;
@@ -113,14 +117,19 @@
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 28px;
+  pointer-events: auto;
 }
+
 .opening-location {
-  margin-top: 22px;
+  margin-top: 24px;
   font-size: 8px;
-  letter-spacing: .1em;
+  letter-spacing: .12em;
   color: #8f9b86;
 }
 
+/* ==========================================================================
+   Interactive Orbiting Stickers
+   ========================================================================== */
 .sticker-drag {
   position: absolute;
   cursor: grab;
@@ -130,22 +139,51 @@
 }
 .sticker-drag:active { cursor: grabbing; }
 
-/* Orbit around the centered statement */
-.sticker-headphones.headphones-desk { top: 2%; right: 1%; left: auto; z-index: 9; }
-.sticker-headphones.headphones-mobile { display: none; }
-.sticker-ticket { right: 2%; bottom: 8%; top: auto; left: auto; z-index: 7; }
-.sticker-photo { left: 2%; top: 36%; right: auto; bottom: auto; z-index: 8; }
-
-.cta-ledge {
-  position: relative;
-  display: inline-flex;
-  pointer-events: auto;
+/* Desktop Orbit Layout: Clean side margins, zero overlap on center */
+.sticker-headphones {
+  top: 4%;
+  right: clamp(16px, 3.5vw, 60px);
+  left: auto;
+  z-index: 6;
 }
+
+.sticker-ticket {
+  right: clamp(16px, 3.5vw, 60px);
+  bottom: clamp(24px, 6vh, 60px);
+  top: auto;
+  left: auto;
+  z-index: 7;
+}
+
+.sticker-photo {
+  left: clamp(16px, 3.5vw, 60px);
+  top: clamp(28%, 34vh, 42%);
+  right: auto;
+  bottom: auto;
+  z-index: 8;
+}
+
+.sticker-drag {
+  position: absolute;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition: filter 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sticker-drag:active { cursor: grabbing; }
 
 .headphone-object {
   display: block;
-  width: clamp(180px, 20vw, 250px);
-  filter: drop-shadow(8px 16px 7px #0005);
+  width: clamp(140px, 14vw, 190px);
+  filter: drop-shadow(8px 16px 14px rgba(0, 0, 0, 0.55));
+  transition: filter 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.headphone-object:hover {
+  filter: drop-shadow(12px 24px 22px rgba(0, 0, 0, 0.68));
+}
+.headphone-object:active {
+  filter: drop-shadow(18px 34px 30px rgba(0, 0, 0, 0.8));
 }
 .headphone-object svg {
   width: 100%;
@@ -155,9 +193,9 @@
 }
 .headphone-object > span {
   position: absolute;
-  left: 4px;
+  left: 0;
   top: -14px;
-  font: italic 13px Georgia, serif;
+  font: italic 12px Georgia, serif;
   color: #cdd6bf;
   white-space: nowrap;
   pointer-events: none;
@@ -165,75 +203,86 @@
 
 .resume-ticket {
   display: block;
-  width: clamp(190px, 18vw, 250px);
+  width: clamp(170px, 15vw, 215px);
   background: #eaa078;
   color: #2d3024;
-  padding: 16px 46px 14px 16px;
-  box-shadow: 5px 9px 0 #090f0c25, 4px 14px 25px #0003;
+  padding: 14px 42px 12px 14px;
+  box-shadow: 5px 9px 0 #090f0c25, 4px 14px 25px rgba(0, 0, 0, 0.45);
   border: 1px solid #f2b58d;
+  transition: box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1), transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.resume-ticket:hover {
+  box-shadow: 7px 14px 0 #090f0c25, 8px 22px 34px rgba(0, 0, 0, 0.58);
+}
+.resume-ticket:active {
+  box-shadow: 10px 20px 0 #090f0c20, 12px 30px 44px rgba(0, 0, 0, 0.7);
 }
 .resume-ticket::before,
 .resume-ticket::after {
   content: "";
   position: absolute;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  right: 28px;
+  right: 24px;
   background: #161a17;
 }
-.resume-ticket::before { top: -8px; }
-.resume-ticket::after { bottom: -8px; }
+.resume-ticket::before { top: -6px; }
+.resume-ticket::after { bottom: -6px; }
+
 .ticket-small { font-size: 6px; letter-spacing: .1em; }
 .resume-ticket strong {
   display: block;
-  font: 600 clamp(16px, 1.5vw, 20px) var(--font-display);
+  font: 600 clamp(15px, 1.4vw, 18px) var(--font-display);
   letter-spacing: -.08em;
-  margin: 12px 0;
+  margin: 10px 0;
 }
 .ticket-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid #5e543a50;
-  padding-top: 10px;
+  padding-top: 8px;
   font-size: 8px;
   line-height: 1.5;
 }
 .ticket-bottom small { font-size: 6px; letter-spacing: .07em; }
-.ticket-bottom b { font-size: 22px; font-weight: 400; }
+.ticket-bottom b { font-size: 20px; font-weight: 400; }
 .ticket-stub {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 36px;
+  width: 32px;
   border-left: 1px dashed #60553880;
   display: flex;
   align-items: center;
   justify-content: center;
   writing-mode: vertical-rl;
-  font-size: 9px;
+  font-size: 8.5px;
   letter-spacing: .18em;
-}
-.resume-ticket:focus-visible {
-  outline: 2px solid #2d3024;
-  outline-offset: 3px;
 }
 
 .opening-photo {
-  width: clamp(120px, 13vw, 155px);
-  height: clamp(160px, 17vw, 205px);
+  width: clamp(112px, 11vw, 145px);
+  height: clamp(150px, 15vw, 192px);
   background: #f0e6d4;
   color: #3f3c2c;
-  box-shadow: 5px 12px 24px #0005;
+  box-shadow: 5px 12px 24px rgba(0, 0, 0, 0.5);
   text-align: left;
   display: block;
   cursor: inherit;
+  transition: box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.opening-photo:hover {
+  box-shadow: 9px 20px 32px rgba(0, 0, 0, 0.65);
+}
+.opening-photo:active {
+  box-shadow: 14px 28px 44px rgba(0, 0, 0, 0.8);
 }
 .opening-photo-face {
   position: absolute;
-  inset: 8px;
+  inset: 7px;
   display: flex;
   flex-direction: column;
   backface-visibility: hidden;
@@ -246,19 +295,19 @@
   object-position: 50% 89%;
 }
 .opening-photo-face > span {
-  font: italic 11px/1.35 Georgia, serif;
-  padding: 8px 2px 0;
+  font: italic 10.5px/1.35 Georgia, serif;
+  padding: 7px 2px 0;
 }
-.opening-photo-face em { font-size: 9px; }
-.photo-message { padding: 8px 2px; }
-.photo-message strong { font: italic 18px/1.1 Georgia, serif; }
-.photo-message > span { font-size: 11px; line-height: 1.4; margin-top: 8px; }
-.photo-message > em { margin-top: auto; font: italic 9px Georgia, serif; }
+.opening-photo-face em { font-size: 8.5px; }
+.photo-message { padding: 7px 2px; }
+.photo-message strong { font: italic 17px/1.1 Georgia, serif; }
+.photo-message > span { font-size: 10.5px; line-height: 1.4; margin-top: 6px; }
+.photo-message > em { margin-top: auto; font: italic 8.5px Georgia, serif; }
 
 .objects-note {
   position: absolute;
   left: 50%;
-  bottom: 10px;
+  bottom: 8px;
   transform: translateX(-50%);
   z-index: 3;
   margin: 0;
@@ -290,66 +339,115 @@
   font: italic 16px Georgia, serif;
 }
 
+/* ==========================================================================
+   Responsive Breakpoints: Zero Collision, Clean Airy Rhythm
+   ========================================================================== */
 @media (max-width: 1100px) {
-  .opening-stage { min-height: 580px; }
-  .opening-statement { max-width: 18ch; }
-  .sticker-headphones.headphones-desk { top: 1%; right: 0; left: auto; }
-  .sticker-ticket { right: 0; bottom: 4%; top: auto; left: auto; }
-  .sticker-photo { left: 0; top: 38%; right: auto; bottom: auto; }
+  .opening-stage {
+    min-height: 560px;
+    padding: 30px 20px 60px;
+  }
+  .sticker-headphones { top: 2%; right: 10px; width: 140px; }
+  .sticker-ticket { right: 10px; bottom: 20px; width: 170px; }
+  .sticker-photo { left: 10px; top: 32%; width: 115px; }
 }
 
-@media (max-width: 767px) {
-  .personal-opening { padding: 20px 24px 0; }
-  .opening-kicker { font-size: 7px; }
-  .opening-kicker a { font-size: 0; gap: 0; min-height: 24px; }
+@media (max-width: 768px) {
+  .personal-opening {
+    padding: 16px 20px 0;
+  }
+  .opening-kicker {
+    font-size: 7.5px;
+  }
+  .opening-kicker a {
+    gap: 6px;
+    min-height: 32px;
+  }
+
   .opening-stage {
     min-height: 0;
-    padding: 28px 0 210px;
-    place-items: start center;
+    padding: 24px 0 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-  .opening-center { padding-top: 8px; }
-  .opening-hello { font-size: 17px; }
-  .opening-statement { font-size: clamp(26px, 8vw, 36px); max-width: 14ch; }
-  .opening-support { font-size: 14px; }
-  .opening-actions { gap: 18px; margin-top: 22px; }
-  .opening-actions .room-button { font-size: 11px; padding: 12px 15px; }
-  .opening-actions .room-link { font-size: 11px; }
-  .opening-location { font-size: 6px; }
 
-  /* Hide desk orbit cans; perch mobile cans on the CTA ledge */
-  .sticker-headphones.headphones-desk { display: none; }
-  .sticker-headphones.headphones-mobile {
-    display: block;
-    position: absolute;
-    left: 10px;
-    bottom: calc(100% - 22px);
+  .opening-center {
+    width: 100%;
+    padding: 0 4px;
+  }
+  .opening-hello {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .opening-statement {
+    font-size: clamp(28px, 8.4vw, 38px);
+    max-width: 15ch;
+  }
+  .opening-support {
+    font-size: 14px;
+    margin-top: 16px;
+    max-width: 32ch;
+  }
+
+  .opening-actions {
+    margin-top: 24px;
+    gap: 16px;
+  }
+  .opening-actions .room-button {
+    font-size: 12px;
+    padding: 12px 18px;
+  }
+  .opening-actions .room-link {
+    font-size: 12px;
+  }
+
+  .opening-location {
+    font-size: 7px;
+    margin-top: 16px;
+  }
+
+  /* On mobile: Hide redundant hero cans (they live in Side B headphones band) */
+  .sticker-headphones {
+    display: none;
+  }
+
+  /* Place stickers side-by-side cleanly below the CTA block with zero overlap */
+  .sticker-photo {
     top: auto;
-    right: auto;
+    left: 8px;
+    bottom: 28px;
+    width: 120px;
+    height: 160px;
     z-index: 6;
-    width: 112px;
   }
-  .headphones-mobile .headphone-object,
-  .headphone-object.headphones-mobile { width: 112px; }
-  .sticker-headphones.headphones-mobile > span,
-  .headphones-mobile > span {
-    font-size: 9px;
-    top: -10px;
-    left: 0;
-    white-space: nowrap;
-  }
-  .opening-actions { margin-top: 28px; }
-  .cta-ledge .room-button { position: relative; z-index: 2; }
-  .sticker-ticket { top: auto; left: auto; right: -4px; bottom: 36px; z-index: 7; }
-  .resume-ticket { width: 158px; padding: 12px 38px 11px 12px; }
-  .resume-ticket strong { margin: 8px 0; font-size: 14px; }
-  .sticker-photo { top: auto; left: -4px; right: auto; bottom: 36px; z-index: 8; }
-  .opening-photo { width: 100px; height: 136px; }
-  .name-pill { padding: 7px 13px 8px; }
-  .objects-note { display: none; }
 
-  .opening-footer { min-height: 72px; gap: 10px; }
-  .opening-footer > span { font-size: 6px; max-width: 85px; line-height: 1.5; }
-  .opening-footer a { font-size: 12px; }
+  .sticker-ticket {
+    top: auto;
+    left: auto;
+    right: 8px;
+    bottom: 28px;
+    width: 155px;
+    z-index: 7;
+  }
+
+  .objects-note {
+    bottom: 4px;
+    font-size: 9px;
+  }
+
+  .opening-footer {
+    min-height: 64px;
+    gap: 12px;
+  }
+  .opening-footer > span {
+    font-size: 7px;
+    max-width: 90px;
+    line-height: 1.4;
+  }
+  .opening-footer a {
+    font-size: 13px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
