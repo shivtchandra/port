@@ -1244,25 +1244,69 @@ button:active, .room-button:active { transform: scale(.98); }
   width: 100%;
 }
 
+/* Master-Grade Hi-Fi Audio Console Deck */
 .hifi-player-deck {
-  background: #121513;
-  border: 2px solid #232a25;
-  border-radius: 12px;
-  padding: 28px;
+  background: linear-gradient(170deg, #181d19 0%, #111412 50%, #0c0e0d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  padding: 18px 22px 22px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  max-width: 420px;
+  box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 24px rgba(0, 0, 0, 0.6);
+  position: relative;
 }
 
-.hifi-display {
-  background: #0b0d0c;
-  border: 1px solid #1c221e;
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 24px;
-  text-align: left;
+/* Top CNC Machined Header Screws & Model Tag */
+.hifi-deck-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.hifi-screw {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #7a8674 0%, #293026 70%, #151913 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+.hifi-screw::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 1px;
+  background: #11150f;
+  transform: translate(-50%, -50%) rotate(38deg);
+}
+
+.hifi-model-tag {
   font-family: var(--font-mono, monospace);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #556250;
+  text-transform: uppercase;
+}
+
+/* Phosphor OLED Telemetry Display */
+.hifi-display {
+  background: #080a09;
+  border: 1px solid #1c221e;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono, monospace);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.03);
   position: relative;
   overflow: hidden;
 }
@@ -1271,24 +1315,30 @@ button:active, .room-button:active { transform: scale(.98); }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(rgba(18, 150, 100, 0.04) 50%, rgba(0, 0, 0, 0.2) 50%);
+  background: linear-gradient(rgba(18, 150, 100, 0.05) 50%, rgba(0, 0, 0, 0.25) 50%);
   background-size: 100% 4px;
   pointer-events: none;
 }
 
+.hifi-display-main {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
 .hifi-display-kicker {
-  font-size: 9px;
-  color: #6d7f73;
-  letter-spacing: 0.1em;
-  margin-bottom: 6px;
+  font-size: 8px;
+  color: #637569;
+  letter-spacing: 0.12em;
+  margin-bottom: 3px;
   text-transform: uppercase;
 }
 
 .hifi-display-title {
   font-size: 14px;
-  color: #a5d6a7;
-  font-weight: bold;
-  text-shadow: 0 0 4px rgba(165, 214, 167, 0.4);
+  color: #d4e79d;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(212, 231, 157, 0.35);
   margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -1296,143 +1346,278 @@ button:active, .room-button:active { transform: scale(.98); }
 }
 
 .hifi-display-artist {
-  font-size: 11px;
-  color: #81c784;
-  text-shadow: 0 0 4px rgba(129, 199, 132, 0.3);
-  margin-bottom: 8px;
+  font-size: 10.5px;
+  color: #8fa588;
+  text-shadow: 0 0 4px rgba(143, 165, 136, 0.25);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.hifi-display-telemetry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .hifi-display-status {
   font-size: 9px;
   color: #e57373;
-  text-shadow: 0 0 4px rgba(229, 115, 115, 0.3);
-  font-weight: bold;
-  letter-spacing: 0.05em;
+  text-shadow: 0 0 6px rgba(229, 115, 115, 0.35);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
+.hifi-display-status.is-active {
+  color: #d4e79d;
+  text-shadow: 0 0 8px rgba(212, 231, 157, 0.6);
+}
+
+.hifi-display-eq {
+  display: flex;
+  align-items: center;
+}
+
+/* Recessed Acoustic Headphones Visual Stage */
 .hifi-visual-stage {
   position: relative;
-  height: 180px;
+  height: 170px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
-  background: #0d0f0e;
-  border-radius: 8px;
-  border: 1px solid #1c221e;
+  margin-bottom: 14px;
+  background: radial-gradient(ellipse at 50% 65%, #181d18 0%, #0d100d 70%, #070908 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 255, 255, 0.04);
   overflow: hidden;
 }
 
-.hifi-progress-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+.hifi-stage-glow {
+  position: absolute;
+  width: 140px;
+  height: 38px;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgba(212, 231, 157, 0.35) 0%, transparent 72%);
+  filter: blur(12px);
+  pointer-events: none;
+  transition: opacity 0.5s ease;
 }
 
-.hifi-time {
-  font-size: 10px;
+/* Backlit Analog Stereo VU Meter */
+.analog-vu-deck {
+  width: 100%;
+  padding: 10px 12px 12px;
+  background: linear-gradient(180deg, #131713 0%, #090c09 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  margin-bottom: 14px;
+}
+
+.analog-vu-deck.is-powered {
+  border-color: rgba(212, 231, 157, 0.28);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 16px rgba(212, 231, 157, 0.09);
+}
+
+.vu-deck-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.vu-header-title {
   font-family: var(--font-mono, monospace);
-  color: #81c784;
-  text-shadow: 0 0 2px rgba(129, 199, 132, 0.3);
-  min-width: 32px;
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #55624f;
+  text-transform: uppercase;
 }
 
-.hifi-progress-slider {
-  flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: #1c221e;
-  outline: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
-
-.hifi-progress-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #a45a38;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
-
-.hifi-progress-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-.hifi-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-.hifi-btn {
-  background: #1c221e;
-  border: 1px solid #2d3730;
-  color: #b4bfaf;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.hifi-nav-btn {
-  width: 40px;
-  height: 40px;
-}
-
-.hifi-play-btn {
-  width: 56px;
-  height: 56px;
-  background: #a45a38;
-  color: #ece2d1;
-  border-color: #b8653f;
-  box-shadow: 0 4px 12px rgba(164, 90, 56, 0.2);
-}
-
-.hifi-btn:hover {
-  background: #252e28;
-  color: #ece2d1;
-  border-color: #3d4c40;
-}
-
-.hifi-play-btn:hover {
-  background: #b8653f;
-  transform: scale(1.05);
-}
-
-.hifi-play-btn:active {
-  transform: scale(0.95);
-}
-
-.hifi-eq-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 24px;
-}
-.hifi-play-btn {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 2px solid #b8653f;
-  background: #a45a38;
-  color: #ece2d1;
+.vu-header-badge {
   display: inline-flex;
   align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono, monospace);
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #718169;
+}
+
+.vu-header-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3f4a3a;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analog-vu-deck.is-powered .vu-header-led {
+  background: #d4e79d;
+  box-shadow: 0 0 6px #d4e79d;
+}
+
+.vu-stereo-stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.vu-meter-unit {
+  position: relative;
+  aspect-ratio: 1.74;
+  background: radial-gradient(ellipse at 50% 90%, #20271c 0%, #0d120d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+.vu-backlight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(212, 231, 157, 0.04) 0%, transparent 75%);
+  pointer-events: none;
+  transition: opacity 0.5s ease, background 0.5s ease;
+}
+
+.analog-vu-deck.is-powered .vu-backlight {
+  background: radial-gradient(ellipse at 50% 100%, rgba(248, 218, 145, 0.42) 0%, rgba(212, 231, 157, 0.22) 42%, transparent 82%);
+  opacity: 1;
+}
+
+.vu-glass-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.01) 45%, transparent 60%);
+  pointer-events: none;
+  border-radius: 6px;
+}
+
+.vu-dial-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.vu-scale-txt {
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 7.5px;
+  font-weight: 600;
+  fill: #8a997d;
+  letter-spacing: -0.02em;
+}
+
+.vu-bold-txt {
+  font-weight: 800;
+  fill: #b4cb9a;
+}
+
+.vu-red-txt {
+  fill: #e26258;
+}
+
+.vu-brand-txt {
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  fill: #616e58;
+  text-anchor: middle;
+}
+
+.vu-sub-txt {
+  font-family: var(--font-mono, monospace);
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  fill: #4c5745;
+  text-anchor: middle;
+}
+
+.vu-needle-assembly {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 90%;
+  pointer-events: none;
+  display: flex;
   justify-content: center;
+  align-items: flex-end;
+}
+
+.vu-needle {
+  position: absolute;
+  bottom: 6px;
+  width: 1.5px;
+  height: 66px;
+  background: linear-gradient(180deg, #e54d42 0%, #d4e79d 35%, #232a21 100%);
+  transform-origin: 50% 100%;
+  transform: rotate(-38deg);
+  border-radius: 1px;
+  filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.85));
+  will-change: transform;
+}
+
+.vu-needle-tip {
+  position: absolute;
+  top: 0;
+  left: -0.8px;
+  width: 3.1px;
+  height: 14px;
+  background: #e54d42;
+  border-radius: 1px 1px 0 0;
+}
+
+.vu-needle-pivot {
+  position: absolute;
+  bottom: -2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #94a387 0%, #303b2c 55%, #10140f 100%);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.9), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  border: 1px solid #10140f;
+}
+
+/* Integrated Transport Control Console Strip */
+.hifi-console-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 2px 2px;
+}
+
+/* Tactile Machined Terracotta Play Button */
+.hifi-play-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 35% 35%, #bf6740 0%, #9e5332 60%, #783b21 100%);
+  border: 2px solid #c97249;
+  color: #fff6eb;
+  box-shadow: 0 4px 14px rgba(158, 83, 50, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.5);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(164, 90, 56, 0.28);
-  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, background 0.15s ease;
+  position: relative;
 }
 
 .hifi-play-btn:not(.is-listening) svg {
@@ -1440,18 +1625,86 @@ button:active, .room-button:active { transform: scale(.98); }
 }
 
 .hifi-play-btn:hover {
-  background: #b8653f;
   transform: scale(1.06);
+  background: radial-gradient(circle at 35% 35%, #ce734a 0%, #ad5c39 60%, #854226 100%);
+  box-shadow: 0 6px 18px rgba(158, 83, 50, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .hifi-play-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(158, 83, 50, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .hifi-play-btn.is-listening {
-  box-shadow: 0 0 0 3px rgba(165, 214, 167, 0.28), 0 4px 14px rgba(164, 90, 56, 0.35);
+  box-shadow: 0 0 0 3px rgba(212, 231, 157, 0.35), 0 4px 18px rgba(158, 83, 50, 0.6);
 }
 
+/* Scrubber & Telemetry Group */
+.hifi-scrubber-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.hifi-scrubber-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9.5px;
+  font-family: var(--font-mono, monospace);
+  color: #8ba085;
+}
+
+.hifi-track-time,
+.hifi-track-duration {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.hifi-format-badge {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #5c6b57;
+  letter-spacing: 0.12em;
+  background: #090c0a;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hifi-scrubber-track {
+  position: relative;
+  height: 5px;
+  background: #090c0a;
+  border-radius: 3px;
+  border: 1px solid #1a221c;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+}
+
+.hifi-scrubber-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #9e5332, #d4e79d);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.hifi-progress-slider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+}
 
 /* Ensure equalizer bars animate inside the hi-fi deck */
 .hifi-player-deck .eq-bar {
@@ -1486,7 +1739,7 @@ button:active, .room-button:active { transform: scale(.98); }
 
 @media (max-width: 767px) {
   .headphones-band {
-    padding: 60px 24px;
+    padding: 60px 20px;
   }
   
   .headphones-band-intro h2 {
@@ -1494,121 +1747,17 @@ button:active, .room-button:active { transform: scale(.98); }
   }
   
   .hifi-player-deck {
-    padding: 20px;
+    padding: 16px;
   }
-}
 
+  .hifi-console-strip {
+    gap: 12px;
+  }
 
-/* Backlit Analog Stereo VU Meter */
-.analog-vu-deck {
-  width: 100%;
-  padding: 10px 14px;
-  background: linear-gradient(180deg, #181d17 0%, #0e120e 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
-  margin: 10px 0 4px;
-}
-
-.analog-vu-deck.is-powered {
-  border-color: rgba(212, 231, 157, 0.22);
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7), 0 0 14px rgba(212, 231, 157, 0.08);
-}
-
-.vu-stereo-stage {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.vu-meter-unit {
-  position: relative;
-  aspect-ratio: 1.75;
-  background: radial-gradient(ellipse at 50% 90%, #21281e 0%, #111510 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-.vu-backlight {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 100%, rgba(212, 231, 157, 0.06) 0%, transparent 75%);
-  pointer-events: none;
-  transition: opacity 0.5s ease, background 0.5s ease;
-}
-
-.analog-vu-deck.is-powered .vu-backlight {
-  background: radial-gradient(ellipse at 50% 100%, rgba(212, 231, 157, 0.24) 0%, rgba(220, 180, 120, 0.1) 45%, transparent 80%);
-  opacity: 1;
-}
-
-.vu-dial-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.vu-scale-txt {
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 8px;
-  font-weight: 600;
-  fill: #8a997d;
-  letter-spacing: -0.02em;
-}
-
-.vu-red-txt {
-  fill: #e57373;
-}
-
-.vu-brand-txt {
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 7.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  fill: #616e58;
-  text-anchor: middle;
-}
-
-.vu-needle-assembly {
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  height: 90%;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.vu-needle {
-  position: absolute;
-  bottom: 6px;
-  width: 1.5px;
-  height: 62px;
-  background: linear-gradient(180deg, #d44d44 0%, #d4e79d 40%, #1e241c 100%);
-  transform-origin: 50% 100%;
-  transform: rotate(-42deg);
-  border-radius: 1px 1px 0 0;
-  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.6));
-  will-change: transform;
-}
-
-.vu-needle-pivot {
-  position: absolute;
-  bottom: 0px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #8a997d 0%, #273024 60%, #121611 100%);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-  border: 1px solid #141813;
+  .hifi-play-btn {
+    width: 46px;
+    height: 46px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

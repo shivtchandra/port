@@ -156,7 +156,15 @@ export function PersonalChapter() {
   const [dir, setDir] = useState(1);
   const current = photos[index];
   const [listening, setListening] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(30);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
+  };
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -427,18 +435,37 @@ export function PersonalChapter() {
     const onPlay = () => setListening(true);
     const onPause = () => setListening(false);
     const onEnded = () => setListening(false);
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onLoadedMetadata = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        setDuration(audio.duration);
+      }
+    };
+
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("ended", onEnded);
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("loadedmetadata", onLoadedMetadata);
 
     return () => {
       audio.pause();
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audioRef.current = null;
     };
   }, []);
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
 
   const handlePlay = () => {
     const audio = audioRef.current;
@@ -495,57 +522,101 @@ export function PersonalChapter() {
 
           <div className="headphones-band-player">
             <div className="hifi-player-deck">
+              {/* Top Studio Screws & Tag */}
+              <div className="hifi-deck-topbar" aria-hidden="true">
+                <span className="hifi-screw" />
+                <span className="hifi-model-tag">AUDIO LAB · MODEL HB-02</span>
+                <span className="hifi-screw" />
+              </div>
+
+              {/* Phosphor OLED Telemetry Display */}
               <div className="hifi-display">
-                <div className="hifi-display-kicker">NOW PLAYING · SIDE B</div>
-                <div className="hifi-display-title">{NOW_PLAYING.title}</div>
-                <div className="hifi-display-artist">{NOW_PLAYING.artist}</div>
-                <div className="hifi-display-status">
-                  {listening ? "● PLAYING" : "■ READY"}
+                <div className="hifi-display-main">
+                  <div className="hifi-display-kicker">NOW PLAYING · STEREO B-SIDE</div>
+                  <div className="hifi-display-title">{NOW_PLAYING.title}</div>
+                  <div className="hifi-display-artist">{NOW_PLAYING.artist}</div>
+                </div>
+                <div className="hifi-display-telemetry">
+                  <div className={`hifi-display-status ${listening ? "is-active" : ""}`}>
+                    {listening ? "● PLAYING" : "■ READY"}
+                  </div>
+                  <div className="hifi-display-eq">
+                    <Equalizer
+                      bars={6}
+                      className="h-3.5"
+                      barClassName="!bg-[#a5d6a7]"
+                      style={listening ? { opacity: 1 } : { opacity: 0.25 }}
+                    />
+                  </div>
                 </div>
               </div>
 
+              {/* Recessed Acoustic Headphones Visual Stage */}
               <div
                 ref={stageRef}
                 className="hifi-visual-stage"
                 onMouseMove={handleStageMouseMove}
                 onMouseLeave={handleStageMouseLeave}
               >
+                <div
+                  className="hifi-stage-glow"
+                  aria-hidden="true"
+                  style={{ opacity: listening ? 0.85 : 0.15 }}
+                />
                 <PlayerHeadphonesSVG
                   isPlaying={listening}
                   style={{ x: springX, y: springY, rotate: headphonesRotate }}
                 />
               </div>
 
-              <div className="hifi-controls">
+              {/* Backlit Analog Dual-VU Meter */}
+              <AnalogVuMeter isPlaying={listening} className="hifi-vu-meter" />
+
+              {/* Integrated Transport Control Console */}
+              <div className="hifi-console-strip">
                 <button
                   type="button"
                   className={`hifi-play-btn ${listening ? "is-listening" : ""}`}
                   onClick={handlePlay}
                   aria-label={listening ? "Pause High Stakes" : "Play High Stakes"}
                 >
+                  <span className="play-btn-bevel" aria-hidden="true" />
                   {listening ? (
-                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
-                      <rect x="6" y="5" width="4" height="14" fill="currentColor" />
-                      <rect x="14" y="5" width="4" height="14" fill="currentColor" />
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+                      <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+                      <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
                     </svg>
                   ) : (
-                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden>
+                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
                       <polygon points="8,5 19,12 8,19" fill="currentColor" />
                     </svg>
                   )}
                 </button>
-              </div>
 
-              {/* Backlit Analog Dual-VU Meter */}
-              <AnalogVuMeter isPlaying={listening} className="hifi-vu-meter" />
-
-              <div className="hifi-eq-container">
-                <Equalizer
-                  bars={16}
-                  className="h-6"
-                  barClassName="!bg-[#a45a38]"
-                  style={listening ? { opacity: 1 } : { opacity: 0.35 }}
-                />
+                <div className="hifi-scrubber-group">
+                  <div className="hifi-scrubber-labels">
+                    <span className="hifi-track-time">{formatTime(currentTime)}</span>
+                    <span className="hifi-format-badge">FLAC · 44.1kHz</span>
+                    <span className="hifi-track-duration">{formatTime(duration)}</span>
+                  </div>
+                  <div className="hifi-scrubber-track">
+                    <input
+                      type="range"
+                      min="0"
+                      max={duration || 30}
+                      step="0.1"
+                      value={currentTime}
+                      onChange={handleSeek}
+                      className="hifi-progress-slider"
+                      aria-label="Track progress"
+                    />
+                    <div
+                      className="hifi-scrubber-fill"
+                      style={{ width: `${(currentTime / (duration || 30)) * 100}%` }}
+                      aria-hidden="true"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
