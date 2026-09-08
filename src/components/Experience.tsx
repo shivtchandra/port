@@ -14,8 +14,8 @@ const STATIC_EXPERIENCES = [
     id: "1",
     role: "Multicloud Engineer Associate",
     company: "Cognizant",
-    period: "Feb 2026 – Present",
-    impact: "Structured multicloud training track across AWS, Azure, and GCP.",
+    period: "Feb 2026 – Sep 2026",
+    impact: "Completed structured multicloud training across AWS, Azure, and GCP.",
     tech: ["AWS", "Azure", "GCP"],
   },
   {

@@ -11,7 +11,7 @@ import { TrackLabel } from "@/components/ui/TrackLabel";
 import { EndOfSideA } from "@/components/ui/SideMarker";
 
 const STATIC_SETTINGS = {
-  bio: "Full-Stack & AI engineer currently at Cognizant as a Multicloud Associate. I've shipped production LMS platforms, RAG-based automation tools, a Chrome extension with a 5.0 rating, and AI products used by real people — end to end, from architecture to deployment.",
+  bio: "Full-Stack & AI engineer, previously Multicloud Associate at Cognizant. I've shipped production LMS platforms, RAG-based automation tools, a Chrome extension with a 5.0 rating, and AI products used by real people — end to end, from architecture to deployment.",
   location: "Hyderabad, India",
   email: "shivachandra9490@gmail.com",
   education: [
@@ -81,8 +81,8 @@ export default function About() {
         <div className="lg:col-span-3">
           <FadeIn delay={0.1}>
             <p className="text-text-muted leading-relaxed text-base md:text-lg mb-6">
-              Full-Stack & AI engineer at{" "}
-              <Highlight>Cognizant</Highlight> as a Multicloud Associate. I care about owning
+              Full-Stack & AI engineer — previously Multicloud Associate at{" "}
+              <Highlight>Cognizant</Highlight>. I care about owning
               problems end-to-end — clear APIs, thoughtful UI, and deployments that stay up.
             </p>
             <p className="text-text-muted leading-relaxed text-base md:text-lg mb-8">

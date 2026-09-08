@@ -26,7 +26,7 @@ const SEED_DATA = {
         { title: "Secondary Education (2019 - 2021)", school: "Narayana Junior College", detail: "Percentage: 92.4%" },
         { title: "High School (2018 - 2019)", school: "FIITJEE", detail: "CGPA: 9.3 / 10.0" }
       ],
-      mission: "Currently working as a Multicloud Engineer Associate at Cognizant. Ready for deployment in mission-critical AI and Full-Stack roles.",
+      mission: "Open to AI and full-stack roles — previously Multicloud Engineer Associate at Cognizant. Ready to own products end to end.",
       specializations: ["Full-Stack Engineering", "AI/ML & RAG Systems", "Cloud Infrastructure (AWS/Azure/GCP)", "Product Automation"]
     }
   },
@@ -39,7 +39,7 @@ const SEED_DATA = {
     { title: 'Cinema Aspect Controller', category: 'Web Extension', image: '/projects/cinema.png', description: 'Streaming video aspect-ratio controller with IMAX and custom presets. Processing data fully client-side.', stack: ['JavaScript', 'Chrome API', 'Manifest V3'], github_link: '#', demo_link: '#', display_order: 6 }
   ],
   experience: [
-    { company: 'Cognizant', role: 'Multicloud Engineer Associate', period: 'Feb 2026 – Present', description: 'Undergoing structured multicloud training covering AWS, Azure, and GCP as part of the Multicloud Engineer track.', tech: ['AWS', 'Azure', 'GCP', 'Cloud Infrastructure'], display_order: 1 },
+    { company: 'Cognizant', role: 'Multicloud Engineer Associate', period: 'Feb 2026 – Sep 2026', description: 'Completed structured multicloud training covering AWS, Azure, and GCP as part of the Multicloud Engineer track.', tech: ['AWS', 'Azure', 'GCP', 'Cloud Infrastructure'], display_order: 1 },
     { company: 'Self-Employed', role: 'Freelance Full-Stack Developer', period: 'Dec 2025 - Feb 2026', description: 'Delivered two production-grade platforms: CyberSecurityTrain (LMS with Razorpay) and TheCyberSeal (B2B portal). Managed end-to-end development from requirements to live deployment.', tech: ['React 18', 'Next.js 15', 'Firebase', 'Supabase', 'Razorpay', 'jsPDF'], display_order: 2 },
     { company: 'Callus', role: 'AI / Full-Stack Automation Intern', period: 'Oct 2025 - Dec 2025', description: 'Built an AI-powered SEO research and knowledge base platform. Automated workflows using n8n and re-implemented as a FastAPI/React application.', tech: ['FastAPI', 'Python', 'React.js', 'n8n', 'OpenAI API', 'Pinecone'], display_order: 3 },
     { company: 'Getto', role: 'Technical Intern', period: 'July 2025 - Oct 2025', description: 'Enhanced the Getto Vendor Panel UI and workflows. Optimized database interactions and implemented scalable UI modules in an Agile environment.', tech: ['React.js', 'Express.js', 'Node.js', 'PostgreSQL', 'Docker'], display_order: 4 },
