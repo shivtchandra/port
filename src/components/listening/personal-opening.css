@@ -131,21 +131,45 @@
 .sticker-drag:active { cursor: grabbing; }
 
 /* Orbit around the centered statement */
-.sticker-headphones.headphones-desk { top: 2%; right: 1%; left: auto; z-index: 9; }
-.sticker-headphones.headphones-mobile { display: none; }
+/* No default desktop/mobile class overrides for stickers */
 .sticker-ticket { right: 2%; bottom: 8%; top: auto; left: auto; z-index: 7; }
 .sticker-photo { left: 2%; top: 36%; right: auto; bottom: auto; z-index: 8; }
 
 .cta-ledge {
   position: relative;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: auto;
+  padding: 0;
+}
+
+.sticker-headphones {
+  position: relative !important; /* Keep in flow so layout is robust */
+  left: auto !important;
+  top: auto !important;
+  margin: 0;
+  display: block;
+  z-index: 5;
 }
 
 .headphone-object {
   display: block;
-  width: clamp(180px, 20vw, 250px);
-  filter: drop-shadow(8px 16px 7px #0005);
+  width: clamp(270px, 30vw, 320px);
+  filter: drop-shadow(0 12px 16px #0006);
+  transform-origin: 50% 48%;
+}
+
+.headphone-object .svg-room-button-bg {
+  transition: fill 150ms ease-out, filter 150ms ease-out, opacity 150ms ease-out;
+}
+.headphone-object:hover .svg-room-button-bg {
+  fill: #e2efbf;
+  filter: brightness(1.02);
+  cursor: pointer;
+}
+.headphone-object:active .svg-room-button-bg {
+  fill: #cbe08b;
 }
 .headphone-object svg {
   width: 100%;
@@ -293,9 +317,15 @@
 @media (max-width: 1100px) {
   .opening-stage { min-height: 580px; }
   .opening-statement { max-width: 18ch; }
-  .sticker-headphones.headphones-desk { top: 1%; right: 0; left: auto; }
+
   .sticker-ticket { right: 0; bottom: 4%; top: auto; left: auto; }
   .sticker-photo { left: 0; top: 38%; right: auto; bottom: auto; }
+}
+
+@media (min-width: 768px) {
+  .sticker-ticket { right: 2%; top: 22%; bottom: auto; left: auto; }
+  .sticker-photo { left: 2%; top: 36%; right: auto; bottom: auto; }
+  .sticker-ticket, .sticker-photo { cursor: pointer; touch-action: auto; }
 }
 
 @media (max-width: 767px) {
@@ -316,29 +346,18 @@
   .opening-actions .room-link { font-size: 11px; }
   .opening-location { font-size: 6px; }
 
-  /* Hide desk orbit cans; perch mobile cans on the CTA ledge */
-  .sticker-headphones.headphones-desk { display: none; }
-  .sticker-headphones.headphones-mobile {
-    display: block;
-    position: absolute;
-    left: 10px;
-    bottom: calc(100% - 22px);
-    top: auto;
-    right: auto;
-    z-index: 6;
-    width: 112px;
+  .cta-ledge {
+    padding: 0;
   }
-  .headphones-mobile .headphone-object,
-  .headphone-object.headphones-mobile { width: 112px; }
-  .sticker-headphones.headphones-mobile > span,
-  .headphones-mobile > span {
-    font-size: 9px;
+  .headphone-object {
+    width: 250px;
+  }
+  .headphone-object > span {
+    font-size: 10px;
     top: -10px;
     left: 0;
-    white-space: nowrap;
   }
   .opening-actions { margin-top: 28px; }
-  .cta-ledge .room-button { position: relative; z-index: 2; }
   .sticker-ticket { top: auto; left: auto; right: -4px; bottom: 36px; z-index: 7; }
   .resume-ticket { width: 158px; padding: 12px 38px 11px 12px; }
   .resume-ticket strong { margin: 8px 0; font-size: 14px; }

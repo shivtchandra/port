@@ -23,11 +23,21 @@ const photos = [
   { src: "/photos/travel-03.jpg", caption: "Worth stepping away from the screen.", stamp: "B-SIDE", paper: "#f8f4ea" },
 ];
 
-const CRATE = [
-  { x: 0, y: 0, rotate: -2.5, scale: 1 },
-  { x: 18, y: 11, rotate: 5.5, scale: 0.975 },
-  { x: -16, y: 18, rotate: -7, scale: 0.95 },
-];
+/** Clothesline hang poses keyed by offset from the active print (−2…2). */
+const LINE = {
+  [-2]: { left: "12%", y: 22, rotate: -9, scale: 0.78, opacity: 0.72, sway: 3.4, bob: 2.8, dur: 4.8 },
+  [-1]: { left: "30%", y: 12, rotate: -4, scale: 0.88, opacity: 0.86, sway: 2.8, bob: 2.2, dur: 4.2 },
+  [0]:  { left: "50%", y: 4,  rotate: 1.5, scale: 1, opacity: 1, sway: 2.4, bob: 2, dur: 3.8 },
+  [1]:  { left: "70%", y: 14, rotate: 5.5, scale: 0.88, opacity: 0.86, sway: 2.9, bob: 2.4, dur: 4.4 },
+  [2]:  { left: "88%", y: 24, rotate: 8.5, scale: 0.78, opacity: 0.72, sway: 3.6, bob: 3, dur: 5 },
+} as const;
+
+function lineOffset(i: number, active: number, len: number) {
+  let d = i - active;
+  if (d > len / 2) d -= len;
+  if (d < -len / 2) d += len;
+  return d;
+}
 
 const NOW_PLAYING = {
   title: "High Stakes",
@@ -216,7 +226,6 @@ export function PersonalChapter() {
   const [side, setSide] = useState<"a" | "b">("a");
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
-  const [cueId, setCueId] = useState(0);
   const current = photos[index];
   const [listening, setListening] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -232,9 +241,16 @@ export function PersonalChapter() {
   });
 
   const cue = (delta: number) => {
-    setDir(delta);
-    setCueId((n) => n + 1);
+    setDir(delta > 0 ? 1 : -1);
     setIndex((i) => (i + delta + photos.length) % photos.length);
+  };
+
+  const hangPrint = (i: number) => {
+    let d = i - index;
+    if (d > photos.length / 2) d -= photos.length;
+    if (d < -photos.length / 2) d += photos.length;
+    if (d === 0) return;
+    cue(d);
   };
 
   useEffect(() => {
@@ -536,47 +552,136 @@ export function PersonalChapter() {
       </div>
 
       <div id="beyond-code" className="personal-content">
-        <div className="photo-collection" aria-label="Side B photo crate">
+        <div className="photo-collection" aria-label="Side B photo line">
           <div className="crate-header">
-            <span>SIDE B · PHOTO CRATE</span>
+            <span>SIDE B · ON THE LINE</span>
             <span>{String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}</span>
           </div>
 
-          <div className="photo-stack">
-            {photos.map((photo, i) => {
-              const position = (i - index + photos.length) % photos.length;
-              if (position > 2) return null;
-              const pose = CRATE[position];
-              const isFront = position === 0;
-              return (
-                <motion.figure
-                  key={isFront ? `${photo.src}-front-${cueId}` : photo.src}
-                  className={isFront ? "is-front" : "is-back"}
-                  aria-hidden={!isFront}
-                  style={{ zIndex: photos.length - position, background: photo.paper }}
-                  initial={
-                    reduced || !isFront
-                      ? false
-                      : { x: dir * 18, y: dir > 0 ? -30 : 22, rotate: dir * 10, scale: 0.96, opacity: 0.75 }
-                  }
-                  animate={
-                    reduced
-                      ? { x: 0, y: position * 8, rotate: 0, scale: 1, opacity: 1 }
-                      : { x: pose.x, y: pose.y, rotate: pose.rotate, scale: pose.scale, opacity: 1 }
-                  }
-                  transition={reduced ? { duration: 0 } : isFront ? { duration: 0.5, ease: ROOM_EASE } : ROOM_SPRING}
-                >
-                  <span className="photo-track">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="photo-stamp">{photo.stamp}</span>
-                  <img src={photo.src} alt={photo.caption} loading="lazy" />
-                  <figcaption>{photo.caption}</figcaption>
-                </motion.figure>
-              );
-            })}
+          <div
+            className="photo-line"
+            tabIndex={0}
+            role="group"
+            aria-label="Photo line. Click a print or use arrow keys."
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft") { e.preventDefault(); cue(-1); }
+              if (e.key === "ArrowRight") { e.preventDefault(); cue(1); }
+            }}
+          >
+            <div className="line-posts" aria-hidden>
+              <span className="line-post" />
+              <span className="line-post" />
+            </div>
+            <svg className="clothes-thread" viewBox="0 0 400 56" preserveAspectRatio="none" aria-hidden>
+              <path
+                className="thread-shadow"
+                d="M4 22 C 110 48, 290 48, 396 22"
+                fill="none"
+                stroke="#8a776055"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+              <path
+                className="thread-wire"
+                d="M4 20 C 110 46, 290 46, 396 20"
+                fill="none"
+                stroke="#3a3127"
+                strokeWidth="1.35"
+                strokeLinecap="round"
+              />
+            </svg>
+
+            <div className="line-prints">
+              {photos.map((photo, i) => {
+                const offset = lineOffset(i, index, photos.length);
+                if (Math.abs(offset) > 2) return null;
+                const pose = LINE[offset as keyof typeof LINE];
+                const isActive = offset === 0;
+                return (
+                  <motion.button
+                    key={photo.src}
+                    type="button"
+                    className={`line-hang${isActive ? " is-active" : ""}`}
+                    aria-label={`${photo.stamp}: ${photo.caption}`}
+                    aria-current={isActive ? "true" : undefined}
+                    onClick={() => hangPrint(i)}
+                    data-offset={offset}
+                    style={{ left: pose.left, zIndex: isActive ? 8 : 5 - Math.abs(offset) }}
+                    initial={false}
+                    animate={
+                      reduced
+                        ? { x: "-50%", y: 8, rotate: 0, scale: isActive ? 1 : 0.9, opacity: isActive ? 1 : 0.8 }
+                        : {
+                            x: "-50%",
+                            y: pose.y,
+                            rotate: pose.rotate,
+                            scale: pose.scale,
+                            opacity: pose.opacity,
+                          }
+                    }
+                    transition={
+                      reduced
+                        ? { duration: 0 }
+                        : { type: "spring", stiffness: 220, damping: 18, mass: 0.7, delay: Math.abs(offset) * 0.03 }
+                    }
+                    whileHover={
+                      reduced
+                        ? undefined
+                        : { y: pose.y - 6, scale: pose.scale * 1.04, transition: { type: "spring", stiffness: 320, damping: 18 } }
+                    }
+                    whileTap={reduced ? undefined : { scale: pose.scale * 0.97 }}
+                  >
+                    <motion.div
+                      className="line-sway"
+                      key={`sway-${photo.src}-${isActive ? index : "side"}`}
+                      initial={
+                        reduced
+                          ? false
+                          : isActive
+                            ? { rotate: dir * -3.5, y: -2 }
+                            : false
+                      }
+                      animate={
+                        reduced
+                          ? { rotate: 0, y: 0 }
+                          : {
+                              rotate: [0, pose.sway, -pose.sway * 0.7, pose.sway * 0.3, 0],
+                              y: [0, pose.bob, pose.bob * 0.35, pose.bob * 0.7, 0],
+                            }
+                      }
+                      transition={
+                        reduced
+                          ? { duration: 0 }
+                          : {
+                              duration: pose.dur,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                              delay: i * 0.35,
+                            }
+                      }
+                    >
+                      <span className="line-clip" aria-hidden>
+                        <svg viewBox="0 0 18 28" width="14" height="22">
+                          <path d="M9 2 C5 2 3 5 3 8 C3 12 7 14 7 18 V22" fill="none" stroke="#5c5143" strokeWidth="1.6" strokeLinecap="round" />
+                          <path d="M9 2 C13 2 15 5 15 8 C15 12 11 14 11 18 V22" fill="none" stroke="#5c5143" strokeWidth="1.6" strokeLinecap="round" />
+                          <circle cx="9" cy="8" r="2.2" fill="#c4b49a" stroke="#5c5143" strokeWidth="1" />
+                        </svg>
+                      </span>
+                      <span className="line-twine" aria-hidden />
+                      <figure style={{ background: photo.paper }}>
+                        <span className="photo-track">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="photo-stamp">{photo.stamp}</span>
+                        <img src={photo.src} alt="" loading="lazy" draggable={false} />
+                        {isActive && <figcaption>{photo.caption}</figcaption>}
+                      </figure>
+                    </motion.div>
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="photo-controls">
-            <button type="button" aria-label="Previous track" onClick={() => cue(-1)}>←</button>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={current.src}
@@ -587,12 +692,11 @@ export function PersonalChapter() {
                 transition={{ duration: reduced ? 0 : 0.22, ease: ROOM_EASE }}
                 aria-live="polite"
               >
-                <small>NOW SHOWING · SIDE B</small>
+                <small>HUNG TO DRY · SIDE B</small>
                 <strong>{String(index + 1).padStart(2, "0")} — {current.caption}</strong>
                 <em>{current.stamp}</em>
               </motion.div>
             </AnimatePresence>
-            <button type="button" aria-label="Cue next track" onClick={() => cue(1)}>→</button>
           </div>
         </div>
 

@@ -1,45 +1,38 @@
 "use client";
-import { useRef, useState, type MouseEvent, type PointerEvent } from "react";
+import { useRef, useState, useSyncExternalStore, type MouseEvent, type PointerEvent } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ROOM_SPRING } from "@/lib/room-motion";
 import "./personal-opening.css";
 
 
+const desktopQuery = "(min-width: 768px)";
+const subscribeDesktop = (notify: () => void) => {
+  const query = window.matchMedia(desktopQuery);
+  query.addEventListener("change", notify);
+  return () => query.removeEventListener("change", notify);
+};
+
 function HeadphonesMark({ gradientId }: { gradientId: string }) {
-  const metal = `${gradientId}-metal`;
-  const pad = `${gradientId}-pad`;
+  const silhouette = `${gradientId}-silhouette`;
+
   return (
     <>
-      <svg viewBox="0 0 320 290" aria-hidden>
+      <svg viewBox="0 0 1254 1100" aria-hidden>
         <defs>
-          <linearGradient id={metal}>
-            <stop stopColor="#414b42" />
-            <stop offset=".35" stopColor="#d0d4c1" />
-            <stop offset=".6" stopColor="#89957c" />
-            <stop offset="1" stopColor="#384537" />
-          </linearGradient>
-          <linearGradient id={pad} x2="1" y2="1">
-            <stop stopColor="#4a5346" />
-            <stop offset=".5" stopColor="#1a211a" />
-            <stop offset="1" stopColor="#343d2f" />
-          </linearGradient>
+          {/* Clip the product photograph to its silhouette, including the open arch. */}
+          <mask id={silhouette} maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254">
+            <path fill="white" stroke="black" strokeWidth="18" strokeLinejoin="round" d="M 140 416 C 220 188 410 64 628 66 C 850 64 1037 194 1111 417 L 1140 511 L 1152 645 Q 1174 675 1154 733 C 1190 803 1170 955 1122 1088 Q 1100 1135 1034 1140 C 960 1204 822 1170 785 1115 C 745 1055 800 822 841 739 Q 882 660 966 675 Q 1045 684 1080 740 L 1121 691 L 1090 529 L 1060 460 C 958 268 803 187 628 186 C 439 184 278 294 185 461 L 155 528 L 132 682 L 174 741 Q 225 677 291 674 C 365 664 411 743 443 844 C 478 947 499 1093 462 1131 C 398 1200 280 1190 219 1140 C 149 1138 126 1100 108 1042 C 76 922 69 806 110 737 Q 84 701 103 654 L 123 513 Z" />
+          </mask>
         </defs>
-        <path d="M57 183V133C57 5 263 5 263 133V183" fill="none" stroke="#101710" strokeWidth="32" />
-        <path d="M57 183V133C57 5 263 5 263 133V183" fill="none" stroke={`url(#${metal})`} strokeWidth="19" />
-        <path d="M67 119C77 20 243 20 253 119" fill="none" stroke="#333e30" strokeWidth="26" strokeLinecap="round" />
-        <path d="M71 103C97 36 227 35 250 103" fill="none" stroke="#849077" strokeWidth="2" opacity=".55" />
-        <g transform="rotate(-12 64 191)">
-          <rect x="33" y="141" width="51" height="100" rx="23" fill={`url(#${metal})`} />
-          <rect x="62" y="135" width="38" height="112" rx="18" fill={`url(#${pad})`} stroke="#68735e" strokeWidth="2" />
-          <path d="M76 147V235" stroke="#88957a" strokeWidth="2" opacity=".4" />
+        <g transform="translate(0 -30) scale(1 0.88)">
+          <image href="/headphones-real-v2.png" width="1254" height="1254" mask={`url(#${silhouette})`} />
+          <rect x="417" y="856" width="420" height="190" rx="22" fill="#080c08" opacity="0.28" />
+          <rect className="svg-room-button-bg" x="417" y="845" width="420" height="190" rx="22" fill="#d8e99f" stroke="#edf5d0" strokeWidth="2" />
+          <text x="627" y="917" dominantBaseline="middle" textAnchor="middle" fill="#20271b" fontSize="46" fontWeight="600" letterSpacing="0">
+            <tspan x="627">View selected</tspan>
+            <tspan x="627" dy="56">work ↗</tspan>
+          </text>
         </g>
-        <g transform="rotate(12 258 191)">
-          <rect x="235" y="141" width="51" height="100" rx="23" fill={`url(#${metal})`} />
-          <rect x="220" y="135" width="38" height="112" rx="18" fill={`url(#${pad})`} stroke="#68735e" strokeWidth="2" />
-          <path d="M244 147V235" stroke="#88957a" strokeWidth="2" opacity=".4" />
-        </g>
-        <path d="M266 240C292 293 158 256 126 282" fill="none" stroke="#839273" strokeWidth="4" />
-        <text x="160" y="76" textAnchor="middle" fill="#c4cbb6" fontSize="9" letterSpacing="4">SIDE B</text>
       </svg>
       <span>What’s in my headphones? ↗</span>
     </>
@@ -52,6 +45,7 @@ export function PersonalOpening() {
   const stage = useRef<HTMLDivElement>(null);
   const moved = useRef(false);
   const canDrag = !reduced;
+  const desktop = useSyncExternalStore(subscribeDesktop, () => window.matchMedia(desktopQuery).matches, () => true);
 
   const markPointerDown = () => { moved.current = false; };
   const markMoved = (_: unknown, info: { offset: { x: number; y: number } }) => {
@@ -99,34 +93,23 @@ export function PersonalOpening() {
           <div className="opening-actions">
             <span className="cta-ledge">
               <motion.a
-                className="headphone-object sticker-drag sticker-headphones headphones-mobile"
-                href="#music-corner"
-                aria-label="Open my music corner"
+                className="headphone-object sticker-drag sticker-headphones"
+                href="#selected-work"
+                aria-label="View selected work"
                 draggable={false}
-                style={{ rotate: reduced ? 0 : -18, zIndex: 5 }}
+                style={{
+                  rotate: reduced ? 0 : -3,
+                }}
                 {...sharedDrag}
                 onClick={(event) => { suppressIfDragged(event); }}
               >
-                <HeadphonesMark gradientId="hp-mobile" />
+                <HeadphonesMark gradientId="hp-desk" />
               </motion.a>
-              <a className="room-button" href="#selected-work">View selected work <span aria-hidden>↗</span></a>
             </span>
             <a className="room-link" href="#contact">Let’s talk ↗</a>
           </div>
           <p className="opening-location">HYDERABAD, INDIA · IDEAS TO INTERFACES TO LAUNCH</p>
         </div>
-
-        <motion.a
-          className="headphone-object sticker-drag sticker-headphones headphones-desk"
-          href="#music-corner"
-          aria-label="Open my music corner"
-          draggable={false}
-          style={{ rotate: reduced ? 0 : 14, zIndex: 6 }}
-          {...sharedDrag}
-          onClick={(event) => { suppressIfDragged(event); }}
-        >
-          <HeadphonesMark gradientId="hp-desk" />
-        </motion.a>
 
         <motion.a
           className="resume-ticket sticker-drag sticker-ticket"
@@ -137,6 +120,7 @@ export function PersonalOpening() {
           draggable={false}
           style={{ rotate: reduced ? 0 : -8, zIndex: 7 }}
           {...sharedDrag}
+          drag={canDrag && !desktop}
           onClick={(event) => { suppressIfDragged(event); }}
         >
           <span className="ticket-small">ADMIT ONE / YOUR NEXT ENGINEER</span>
@@ -155,6 +139,7 @@ export function PersonalOpening() {
           aria-pressed={flipped}
           style={{ zIndex: 8 }}
           {...sharedDrag}
+          drag={canDrag && !desktop}
           animate={{ rotate: reduced ? 0 : flipped ? -4 : 6 }}
           transition={{ duration: reduced ? 0 : 0.25 }}
           onClick={(event) => {
